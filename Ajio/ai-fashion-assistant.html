@@ -1154,22 +1154,23 @@ async function runTryOnGeneration(id) {
 
   await delay(3200);
 
-  const p = products.tryonProducts.find(x => x.id === id);
+  // Get product — from tryonProducts or from stored selection
+  let p = products.tryonProducts.find(x => x.id === id);
+  if (!p) p = window._tryOnProduct || { name: 'Selected Item', brand: 'AJIO', price: 999 };
+
   const fitMessages = {
     lehenga: { text: '<b>Great fit!</b> The lehenga sits well at the waist. Consider <b>size M</b> for a slightly relaxed drape around the flare.', type: 'good' },
     saree: { text: '<b>Excellent drape!</b> The pallu falls naturally. The blouse may be <b>slightly snug at shoulders</b> \u2014 consider size L.', type: 'warn' },
     dress: { text: '<b>Perfect fit!</b> Size S fits your measurements precisely. The midi length hits right at the calf.', type: 'good' },
-    _selected: { text: '<b>Great fit!</b> This looks amazing on you. The proportions are well-balanced \u2014 consider your usual size.', type: 'good' },
   };
-  const fit = fitMessages[id] || fitMessages._selected;
+  const fit = fitMessages[id] || { text: '<b>Great fit!</b> This looks amazing on you. The proportions are well-balanced \u2014 consider your usual size.', type: 'good' };
 
   const tryonColors = {
-    lehenga: { bg: '#FCE4EC', accent: '#C62828', label: 'Lehenga Set' },
-    saree: { bg: '#FFF3E0', accent: '#E65100', label: 'Saree' },
-    dress: { bg: '#E8F5E9', accent: '#2E7D32', label: 'Midi Dress' },
-    _selected: { bg: '#E3F2FD', accent: '#1565C0', label: p.name },
+    lehenga: { bg: '#FCE4EC', accent: '#C62828' },
+    saree: { bg: '#FFF3E0', accent: '#E65100' },
+    dress: { bg: '#E8F5E9', accent: '#2E7D32' },
   };
-  const tc = tryonColors[id] || tryonColors._selected;
+  const tc = tryonColors[id] || { bg: '#E3F2FD', accent: '#1565C0' };
 
   addCard(`<div class="tryon-card">
     <div class="tryon-header">
@@ -1277,10 +1278,7 @@ async function selectProductForTryOn(p) {
 }
 
 async function generateTryOnFromProduct(mode) {
-  const p = window._tryOnProduct || { name: 'Selected Item', brand: 'AJIO', price: 599 };
-  products.tryonProducts.push({ id: '_selected', name: p.name, brand: p.brand, price: p.price, color: '#E3F2FD' });
-  await generateTryOn('_selected', mode);
-  products.tryonProducts = products.tryonProducts.filter(t => t.id !== '_selected');
+  await generateTryOn('_fromcard', mode);
 }
 
 async function crossLinkDiscovery(type) {
