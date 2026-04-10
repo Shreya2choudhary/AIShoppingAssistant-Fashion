@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI Beauty Assistant — Shopping</title>
+<style>
+@font-face { font-family: 'JioType'; font-weight: 400; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 500; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 700; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 900; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2'); }
+
+:root {
+  --primary-20: #e8e8fc; --primary-30: #9999ff; --primary-40: #6464ff;
+  --primary-50: #3535f3; --primary-60: #000093; --primary-70: #00004c;
+  --secondary-20: #fef7e9; --secondary-50: #f7ab20; --secondary-60: #ac660c;
+  --sparkle-20: #e8faf7; --sparkle-50: #1eccb0; --sparkle-60: #1e7b74; --sparkle-70: #0e5c4f;
+  --error: #fa2f40; --warning: #f06d0f; --success: #25ab21;
+  --grey-100: #141414; --grey-80: rgba(0,0,0,0.66); --grey-60: #b5b5b5;
+  --grey-40: #e0e0e0; --grey-20: #f5f5f5; --white: #ffffff;
+  --surface-ghost: #eeeeef; --surface-ghost-icon: #e7e9ff;
+  --surface-bold: #3900ad; --surface-minimal: #f5f5f5;
+  --text-high: #141414; --text-low: rgba(25,27,30,0.65);
+  --text-disabled: rgba(25,27,30,0.38); --text-on-bold: #ffffff;
+  --icon-medium: #170054; --icon-high: #141414;
+  --stroke-subtle: rgba(36,38,43,0.12); --stroke-minimal: rgba(36,38,43,0.13);
+  --shape-sm: 8px; --shape-md: 12px; --shape-lg: 16px; --shape-pill: 999px;
+  --spacing-xs: 8px; --spacing-s: 12px; --spacing-m: 16px; --spacing-l: 20px; --spacing-xl: 24px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'JioType', sans-serif; background: #f0f0f0; color: var(--text-high); height: 100dvh; overflow: hidden; }
+
+.phone-frame {
+  width: 100%; max-width: 390px; height: 100dvh; margin: 0 auto;
+  display: flex; flex-direction: column; background: var(--white);
+  position: relative; overflow: hidden;
+}
+@media (min-width: 768px) {
+  body { display: flex; align-items: center; justify-content: center; }
+  .phone-frame { height: 844px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.15); }
+}
+
+/* === STATUS BAR === */
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 20px 4px; flex-shrink: 0; background: var(--white);
+}
+.status-time { font-size: 15px; font-weight: 700; color: var(--text-high); }
+.status-icons { display: flex; align-items: center; gap: 6px; }
+.status-icons svg { width: 16px; height: 16px; color: var(--text-high); }
+
+/* === HEADER NAV === */
+.header-nav {
+  display: flex; align-items: center; padding: 8px 12px 12px;
+  border-bottom: 1px solid var(--stroke-subtle); flex-shrink: 0; background: var(--white);
+  position: sticky; top: 0; z-index: 10;
+}
+.hn-back { width: 36px; height: 36px; border-radius: 50%; background: transparent;
+  border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.hn-back svg { width: 20px; height: 20px; color: var(--icon-high); }
+.hn-center { flex: 1; padding: 0 8px; }
+.hn-title { font-size: 16px; font-weight: 700; color: var(--text-high); letter-spacing: -0.03em; }
+.hn-sub { font-size: 13px; font-weight: 500; color: var(--text-low); }
+.hn-right { display: flex; gap: 4px; }
+.hn-icon-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-ghost);
+  border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.hn-icon-btn svg { width: 18px; height: 18px; color: var(--icon-medium); }
+
+/* === CHAT === */
+.chat-container {
+  flex: 1; overflow-y: auto; padding: var(--spacing-m);
+  display: flex; flex-direction: column; gap: var(--spacing-s); scroll-behavior: smooth;
+}
+.chat-container::-webkit-scrollbar { display: none; }
+
+.msg-row { display: flex; gap: var(--spacing-xs); max-width: 100%; }
+.msg-row.ai { align-items: flex-start; }
+.msg-row.user { justify-content: flex-end; }
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--primary-20);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+}
+.msg-avatar svg { width: 16px; height: 16px; color: var(--primary-50); }
+.msg-avatar video { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.msg-content { display: flex; flex-direction: column; gap: 6px; max-width: 85%; }
+.msg-bubble {
+  padding: 10px 14px; border-radius: var(--shape-lg); font-size: 15px; font-weight: 500;
+  line-height: 1.5; max-width: 100%;
+}
+.msg-row.ai .msg-bubble { background: var(--surface-ghost); color: var(--text-high); border-bottom-left-radius: 4px; }
+.msg-row.user .msg-bubble { background: var(--primary-50); color: var(--white); border-bottom-right-radius: 4px; }
+
+/* Voice bubble */
+.voice-bubble {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: var(--primary-50); color: var(--white); border-radius: var(--shape-lg); border-bottom-right-radius: 4px;
+}
+.voice-wave { display: flex; align-items: center; gap: 2px; height: 20px; }
+.voice-wave span { width: 3px; border-radius: 2px; background: rgba(255,255,255,0.7); animation: vwave 0.8s infinite ease-in-out; }
+.voice-wave span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.voice-wave span:nth-child(2) { height: 14px; animation-delay: 0.1s; }
+.voice-wave span:nth-child(3) { height: 20px; animation-delay: 0.2s; }
+.voice-wave span:nth-child(4) { height: 12px; animation-delay: 0.3s; }
+.voice-wave span:nth-child(5) { height: 6px; animation-delay: 0.4s; }
+@keyframes vwave { 0%,100%{transform:scaleY(0.5)} 50%{transform:scaleY(1)} }
+.voice-label { font-size: 13px; font-weight: 700; }
+
+/* Typing indicator */
+.typing-row { display: flex; gap: var(--spacing-xs); align-items: flex-start; }
+.typing-dots { display: flex; gap: 4px; padding: 12px 14px; background: var(--surface-ghost); border-radius: var(--shape-lg); border-bottom-left-radius: 4px; }
+.typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--grey-60); animation: bounce 1.2s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-6px);opacity:1} }
+
+/* === CARDS === */
+.card-wrap { animation: cardUp 0.4s ease-out; width: 100%; }
+@keyframes cardUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* Category Cards */
+.cat-cards { display: flex; flex-direction: column; gap: var(--spacing-xs); width: 100%; }
+.cat-card {
+  display: flex; align-items: center; gap: var(--spacing-s); padding: 14px;
+  background: var(--white); border: 1.5px solid var(--stroke-subtle); border-radius: var(--shape-lg);
+  cursor: pointer; transition: all 0.15s;
+}
+.cat-card:active { transform: scale(0.98); border-color: var(--primary-50); }
+.cat-card-icon {
+  width: 44px; height: 44px; border-radius: var(--shape-md); display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.cat-card-icon svg { width: 22px; height: 22px; }
+.cat-card-text { flex: 1; }
+.cat-card-title { font-size: 15px; font-weight: 700; color: var(--text-high); }
+.cat-card-sub { font-size: 13px; font-weight: 500; color: var(--text-low); margin-top: 2px; }
+.cat-card-arrow svg { width: 18px; height: 18px; color: var(--grey-60); }
+
+/* Product cart card */
+.cart-card {
+  background: var(--white); border: 1px solid var(--stroke-subtle);
+  border-radius: var(--shape-lg); overflow: hidden; width: 100%;
+}
+.cart-header {
+  padding: var(--spacing-s) 14px; display: flex; align-items: center;
+  justify-content: space-between; border-bottom: 1px solid var(--stroke-subtle); background: var(--grey-20);
+}
+.cart-header-left { display: flex; align-items: center; gap: var(--spacing-xs); }
+.cart-header-left svg { width: 18px; height: 18px; color: var(--primary-50); }
+.cart-header-left span { font-size: 14px; font-weight: 700; }
+.cart-count { font-size: 12px; font-weight: 700; color: var(--primary-50); background: var(--primary-20); padding: 2px 8px; border-radius: var(--shape-pill); }
+
+.prod-row {
+  display: flex; align-items: center; padding: 10px 14px; gap: 10px;
+  border-bottom: 1px solid var(--stroke-subtle);
+}
+.prod-row:last-of-type { border-bottom: none; }
+.prod-thumb {
+  width: 48px; height: 48px; border-radius: var(--shape-sm); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;
+  color: var(--white); letter-spacing: -0.5px;
+}
+.prod-info { flex: 1; min-width: 0; }
+.prod-name { font-size: 13px; font-weight: 700; color: var(--text-high); line-height: 1.3; }
+.prod-variant { font-size: 11px; font-weight: 500; color: var(--text-low); margin-top: 1px; }
+.prod-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.prod-rating { display: flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: var(--secondary-60); }
+.prod-rating svg { width: 12px; height: 12px; color: var(--secondary-50); }
+.prod-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px; background: var(--sparkle-20); color: var(--sparkle-70); }
+.prod-price-col { text-align: right; flex-shrink: 0; }
+.prod-price { font-size: 14px; font-weight: 700; color: var(--text-high); }
+.prod-mrp { font-size: 11px; font-weight: 500; color: var(--text-disabled); text-decoration: line-through; }
+
+.cart-total {
+  padding: var(--spacing-s) 14px; display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--stroke-subtle); background: var(--grey-20);
+}
+.cart-total-left {}
+.cart-total-label { font-size: 14px; font-weight: 700; }
+.cart-total-sub { font-size: 11px; font-weight: 500; color: var(--text-low); }
+.cart-total-price { font-size: 18px; font-weight: 900; color: var(--primary-50); letter-spacing: -0.03em; }
+.cart-delivery {
+  display: flex; align-items: center; gap: 4px; padding: 6px var(--spacing-s);
+  background: var(--sparkle-20); font-size: 12px; font-weight: 700; color: var(--sparkle-70); justify-content: center;
+}
+.cart-delivery svg { width: 14px; height: 14px; }
+
+/* Chips */
+.chip-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 4px 0; }
+.chip {
+  padding: 6px 12px; border-radius: var(--shape-pill); font-size: 12px; font-weight: 700;
+  font-family: 'JioType', sans-serif; cursor: pointer; border: none; transition: transform 0.15s; white-space: nowrap;
+}
+.chip:active { transform: scale(0.96); }
+.chip-primary { background: var(--primary-50); color: var(--white); }
+.chip-secondary { background: var(--surface-ghost); color: var(--text-high); }
+.chip-sparkle { background: var(--sparkle-20); color: var(--sparkle-70); }
+.chip-outline { background: var(--white); color: var(--text-high); border: 1.5px solid var(--stroke-subtle); }
+
+/* Payment Card */
+.payment-card {
+  background: var(--white); border: 1px solid var(--stroke-subtle); border-radius: var(--shape-lg);
+  overflow: hidden; width: 100%;
+}
+.pay-header { padding: 14px var(--spacing-m); border-bottom: 1px solid var(--stroke-subtle); display: flex; align-items: center; gap: 10px; }
+.pay-header-text { flex: 1; }
+.pay-header-title { font-size: 14px; font-weight: 700; }
+.pay-header-sub { font-size: 12px; font-weight: 500; color: var(--text-low); margin-top: 1px; }
+.pay-amount { display: flex; align-items: baseline; justify-content: space-between; padding: var(--spacing-s) var(--spacing-m); background: var(--grey-20); border-bottom: 1px solid var(--stroke-subtle); }
+.pay-amount-label { font-size: 12px; font-weight: 500; color: var(--text-low); }
+.pay-amount-val { font-size: 22px; font-weight: 900; }
+.pay-methods { padding: 6px 0; }
+.pay-method { display: flex; align-items: center; gap: var(--spacing-s); padding: var(--spacing-s) var(--spacing-m); cursor: pointer; transition: background 0.15s; }
+.pay-method:hover { background: var(--grey-20); }
+.pay-method-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; font-weight: 900; }
+.pay-method-info { flex: 1; }
+.pay-method-name { font-size: 14px; font-weight: 700; }
+.pay-method-detail { font-size: 11px; font-weight: 500; color: var(--text-low); margin-top: 1px; }
+.pay-method-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px; margin-left: 6px; }
+.pay-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--grey-60); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+.pay-method.selected .pay-radio { border-color: var(--primary-50); background: var(--primary-50); }
+.pay-method.selected .pay-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--white); }
+.pay-footer { padding: var(--spacing-s) var(--spacing-m); border-top: 1px solid var(--stroke-subtle); }
+.pay-btn { width: 100%; padding: 14px; border-radius: var(--shape-md); border: none; background: var(--primary-50); color: var(--white); font-size: 15px; font-weight: 700; font-family: 'JioType', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.pay-secured { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 8px; font-size: 10px; font-weight: 500; color: var(--text-disabled); }
+
+/* Order Confirm */
+.confirm-card { background: var(--white); border: 1px solid var(--stroke-subtle); border-radius: var(--shape-lg); padding: 20px var(--spacing-m); text-align: center; width: 100%; }
+.confirm-icon { width: 48px; height: 48px; border-radius: 50%; background: #e6f4e6; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.confirm-icon svg { width: 28px; height: 28px; color: var(--success); }
+.confirm-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.confirm-sub { font-size: 13px; font-weight: 500; color: var(--text-low); line-height: 1.5; }
+.confirm-id { display: inline-block; background: var(--grey-20); padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; color: var(--text-low); margin-top: 8px; letter-spacing: 0.5px; }
+.confirm-eta { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--stroke-subtle); }
+.confirm-eta span { font-size: 14px; font-weight: 700; color: var(--success); }
+
+/* Tracking */
+.track-card { background: var(--white); border: 1px solid var(--stroke-subtle); border-radius: var(--shape-lg); padding: 14px; width: 100%; }
+.track-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.track-header span { font-size: 14px; font-weight: 700; }
+.track-steps { display: flex; flex-direction: column; }
+.track-step { display: flex; align-items: flex-start; gap: 10px; padding-bottom: 14px; }
+.track-step:last-child { padding-bottom: 0; }
+.track-dot-col { display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0; }
+.track-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--grey-40); flex-shrink: 0; margin-top: 3px; }
+.track-dot.done { background: var(--success); }
+.track-dot.current { background: var(--primary-50); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(53,53,243,0.3)} 50%{box-shadow:0 0 0 6px rgba(53,53,243,0)} }
+.track-line { width: 2px; flex: 1; background: var(--grey-40); min-height: 14px; }
+.track-line.done { background: var(--success); }
+.track-step-info { flex: 1; }
+.track-step-title { font-size: 13px; font-weight: 700; }
+.track-step-sub { font-size: 11px; font-weight: 500; color: var(--text-low); }
+
+/* Notification Cards */
+.notif-card { border-radius: var(--shape-lg); overflow: hidden; border: 1px solid var(--stroke-subtle); width: 100%; }
+.notif-accent { padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.notif-accent svg { width: 16px; height: 16px; flex-shrink: 0; }
+.notif-accent-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+.notif-accent-time { margin-left: auto; font-size: 10px; font-weight: 500; opacity: 0.8; }
+.notif-body { padding: 14px; background: var(--white); }
+.notif-product { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.notif-product-info { flex: 1; min-width: 0; }
+.notif-product-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.notif-product-detail { font-size: 12px; font-weight: 500; color: var(--text-low); margin-top: 2px; }
+.notif-context { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 500; line-height: 1.4; margin-bottom: 12px; }
+.notif-context svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+.notif-actions { display: flex; gap: 8px; align-items: center; }
+.notif-btn-primary { flex: 1; padding: 10px 16px; border-radius: var(--shape-md); border: none; font-size: 14px; font-weight: 700; font-family: 'JioType', sans-serif; cursor: pointer; color: var(--white); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.notif-btn-dismiss { padding: 10px 14px; border-radius: var(--shape-md); border: 1.5px solid var(--stroke-subtle); background: var(--white); color: var(--text-low); font-size: 13px; font-weight: 700; font-family: 'JioType', sans-serif; cursor: pointer; }
+.notif-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 12px; }
+.notif-price-now { font-size: 20px; font-weight: 900; }
+.notif-price-was { font-size: 13px; font-weight: 500; color: var(--text-disabled); text-decoration: line-through; }
+.notif-price-save { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+
+/* Replenish type */
+.notif-replenish .notif-accent { background: var(--primary-50); color: var(--white); }
+.notif-replenish .notif-context { background: var(--primary-20); color: var(--primary-60); }
+.notif-replenish .notif-context svg { color: var(--primary-50); }
+.notif-replenish .notif-btn-primary { background: var(--primary-50); }
+
+/* Price drop type */
+.notif-pricedrop .notif-accent { background: var(--sparkle-50); color: var(--white); }
+.notif-pricedrop .notif-context { background: var(--sparkle-20); color: var(--sparkle-70); }
+.notif-pricedrop .notif-context svg { color: var(--sparkle-50); }
+.notif-pricedrop .notif-btn-primary { background: var(--sparkle-50); }
+.notif-pricedrop .notif-price-save { background: var(--sparkle-20); color: var(--sparkle-70); }
+
+/* Bundle type */
+.notif-bundle .notif-accent { background: var(--secondary-50); color: var(--white); }
+.notif-bundle .notif-context { background: var(--secondary-20); color: var(--secondary-60); }
+.notif-bundle .notif-context svg { color: var(--secondary-50); }
+.notif-bundle .notif-btn-primary { background: var(--secondary-50); }
+
+/* Quiz Card */
+.quiz-card { background: var(--white); border: 1px solid var(--stroke-subtle); border-radius: var(--shape-lg); padding: var(--spacing-m); width: 100%; }
+.quiz-title { font-size: 14px; font-weight: 700; margin-bottom: var(--spacing-s); }
+.quiz-label { font-size: 13px; font-weight: 700; color: var(--text-low); margin-bottom: var(--spacing-xs); text-transform: uppercase; letter-spacing: 0.5px; }
+.quiz-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: var(--spacing-m); }
+.quiz-chip {
+  padding: 8px 14px; border-radius: var(--shape-pill); font-size: 13px; font-weight: 700;
+  font-family: 'JioType', sans-serif; cursor: pointer; border: 1.5px solid var(--stroke-subtle);
+  background: var(--white); color: var(--text-high); transition: all 0.15s;
+}
+.quiz-chip.selected { background: var(--primary-20); border-color: var(--primary-50); color: var(--primary-50); }
+.quiz-chip:active { transform: scale(0.96); }
+.quiz-slider-wrap { margin-bottom: var(--spacing-m); }
+.quiz-slider { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--grey-40); outline: none; }
+.quiz-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary-50); cursor: pointer; }
+.quiz-budget-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.quiz-budget-labels span { font-size: 11px; font-weight: 700; color: var(--text-low); }
+.quiz-budget-val { text-align: center; font-size: 16px; font-weight: 900; color: var(--primary-50); margin-top: 6px; }
+.quiz-submit { width: 100%; padding: 12px; border-radius: var(--shape-pill); border: none; background: var(--primary-50); color: var(--white); font-size: 15px; font-weight: 700; font-family: 'JioType', sans-serif; cursor: pointer; margin-top: 4px; }
+
+/* Comparison Table */
+.compare-card { background: var(--white); border: 1px solid var(--stroke-subtle); border-radius: var(--shape-lg); overflow: hidden; width: 100%; }
+.compare-title { padding: 14px; font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--stroke-subtle); background: var(--grey-20); display: flex; align-items: center; gap: 8px; }
+.compare-title svg { width: 18px; height: 18px; color: var(--primary-50); }
+.compare-item { padding: 12px 14px; border-bottom: 1px solid var(--stroke-subtle); }
+.compare-item:last-child { border-bottom: none; }
+.compare-item-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.compare-item-rank { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; flex-shrink: 0; }
+.compare-item-rank.best { background: var(--sparkle-20); color: var(--sparkle-70); }
+.compare-item-rank.alt { background: var(--grey-20); color: var(--text-low); }
+.compare-item-name { font-size: 14px; font-weight: 700; flex: 1; }
+.compare-item-best-tag { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--sparkle-20); color: var(--sparkle-70); text-transform: uppercase; letter-spacing: 0.3px; }
+.compare-item-price { font-size: 16px; font-weight: 900; color: var(--primary-50); }
+.compare-details { display: flex; gap: var(--spacing-m); }
+.compare-detail { flex: 1; }
+.compare-detail-label { font-size: 10px; font-weight: 700; color: var(--text-disabled); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.compare-detail-val { font-size: 12px; font-weight: 500; color: var(--text-high); line-height: 1.4; }
+.compare-detail-rating { display: flex; align-items: center; gap: 2px; }
+.compare-detail-rating svg { width: 12px; height: 12px; color: var(--secondary-50); }
+.compare-detail-rating span { font-size: 13px; font-weight: 700; color: var(--secondary-60); }
+
+/* Ingredient explainer */
+.ingredient-card { background: var(--primary-20); border-radius: var(--shape-lg); padding: 14px; width: 100%; }
+.ingredient-title { font-size: 13px; font-weight: 700; color: var(--primary-60); margin-bottom: 8px; }
+.ingredient-item { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--text-high); }
+.ingredient-item:last-child { margin-bottom: 0; }
+.ingredient-bullet { color: var(--primary-50); flex-shrink: 0; font-weight: 700; }
+
+/* Profile summary */
+.profile-card { background: var(--sparkle-20); border-radius: var(--shape-lg); padding: 14px; width: 100%; display: flex; align-items: center; gap: 12px; }
+.profile-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--sparkle-50); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.profile-icon svg { width: 20px; height: 20px; color: var(--white); }
+.profile-text { flex: 1; font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--sparkle-70); }
+.profile-text b { font-weight: 700; }
+
+/* Demo badge */
+.demo-badge { display: flex; align-items: center; justify-content: center; padding: 6px 12px; background: var(--grey-20); border-radius: var(--shape-pill); font-size: 12px; font-weight: 700; color: var(--text-low); margin: 0 auto 8px; width: fit-content; }
+
+/* === BOTTOM WIDGET (Live Music Companion style) === */
+.bottom-widget { padding: 8px var(--spacing-s) 12px; background: var(--white); flex-shrink: 0; }
+.bw-container { background: var(--surface-ghost); border-radius: 24px; padding: 4px; display: flex; flex-direction: column; }
+.bw-input { padding: 10px 12px 4px; }
+.bw-real-input { width: 100%; border: none; outline: none; font-family: 'JioType', sans-serif; font-size: 14px; color: var(--text-high); background: transparent; }
+.bw-real-input::placeholder { color: var(--text-low); }
+.bw-actions { display: flex; justify-content: space-between; align-items: center; height: 40px; padding: 0 4px; }
+.bw-left { display: flex; gap: 2px; }
+.wib { width: 36px; height: 36px; border-radius: var(--shape-pill); display: flex; align-items: center; justify-content: center; background: transparent; border: none; cursor: pointer; color: var(--grey-80); }
+.wib:active { background: var(--surface-moderate); }
+.wib svg { width: 20px; height: 20px; }
+.bw-send { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--primary-50); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.bw-send svg { width: 18px; height: 18px; fill: var(--white); }
+.bw-send.hidden-send { display: none; }
+.speak-btn { background: var(--primary-50); border: none; border-radius: var(--shape-pill); padding: 10px 18px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.speak-btn svg { width: 16px; height: 16px; fill: var(--white); }
+.speak-btn span { font-family: 'JioType', sans-serif; font-weight: 700; font-size: 14px; color: var(--white); }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z" fill="currentColor"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M2 22h20V2z" fill="currentColor"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header-nav">
+    <button class="hn-back" onclick="resetDemo()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 20a1.003 1.003 0 01-.71-.29l-7-7a1 1 0 010-1.42l7-7a1.005 1.005 0 011.42 1.42L9.41 12l6.3 6.29a.997.997 0 01.219 1.095.999.999 0 01-.93.615z" fill="currentColor"/></svg>
+    </button>
+    <div class="hn-center">
+      <div class="hn-title">AI Beauty Assistant</div>
+      <div class="hn-sub">Shopping</div>
+    </div>
+    <div class="hn-right">
+      <button class="hn-icon-btn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z" fill="currentColor"/></svg>
+      </button>
+      <button class="hn-icon-btn" onclick="resetDemo()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4a8 8 0 013.85 1H15a1 1 0 100 2h3a1 1 0 001-1V3a1 1 0 00-2 0v.36A10 10 0 0012 2a10 10 0 00-8.65 5A9.94 9.94 0 002 12a1 1 0 102 0 8 8 0 018-8zm9.71 7.29A1 1 0 0020 12a8 8 0 01-11.84 7H9a1 1 0 000-2H6a1 1 0 00-1 1v3a1 1 0 102 0v-.36A10 10 0 0012 22a10 10 0 0010-10 1 1 0 00-.29-.71z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="chat-container" id="CC"></div>
+
+  <!-- Bottom Widget -->
+  <div class="bottom-widget">
+    <div class="bw-container">
+      <div class="bw-input">
+        <input type="text" class="bw-real-input" id="chatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')handleSend()" oninput="toggleSendBtn()">
+      </div>
+      <div class="bw-actions">
+        <div class="bw-left">
+          <button class="wib" title="Add">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+          </button>
+          <button class="wib" title="Voice input">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 11-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <button class="bw-send hidden-send" id="sendBtn" onclick="handleSend()">
+          <svg viewBox="0 0 24 24"><path d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.993.993 0 00-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"/></svg>
+        </button>
+        <button class="speak-btn" id="speakBtn">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <span>Speak</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CC = document.getElementById('CC');
+const chatInput = document.getElementById('chatInput');
+let activeCat = 'skin'; // skin | hair | makeup
+
+// === SVG ICON PATHS ===
+const IC = {
+  cart: 'M8.5 19a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm9 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm4.12-12.17A2 2 0 0020 6H6.58l-.41-1.52A2 2 0 004.23 3H3a1 1 0 000 2h1.23l2.83 10.48A2 2 0 009 17h8.67a2 2 0 001.89-1.37l2.34-7a2 2 0 00-.28-1.8z',
+  star: 'M21.37 9.61a1.964 1.964 0 00-1.52-1.284l-4.235-.646-1.899-4.087a1.917 1.917 0 00-3.434 0L8.38 7.68l-4.273.646a1.964 1.964 0 00-1.52 1.283 1.91 1.91 0 00.447 1.901l3.124 3.213-.74 4.553a1.91 1.91 0 002.88 2.07l3.788-2.091 3.788 2.09a1.9 1.9 0 002.88-2.033l-.74-4.552 3.123-3.213a1.91 1.91 0 00.333-1.93z',
+  refresh: 'M12 4a8 8 0 013.85 1H15a1 1 0 100 2h3a1 1 0 001-1V3a1 1 0 00-2 0v.36A10 10 0 0012 2a10 10 0 00-8.65 5A9.94 9.94 0 002 12a1 1 0 102 0 8 8 0 018-8zm9.71 7.29A1 1 0 0020 12a8 8 0 01-11.84 7H9a1 1 0 000-2H6a1 1 0 00-1 1v3a1 1 0 102 0v-.36A10 10 0 0012 22a10 10 0 0010-10 1 1 0 00-.29-.71z',
+  chevR: 'M10 17a1.002 1.002 0 01-1.006-1 1 1 0 01.296-.71l3.3-3.29-3.3-3.29a1.004 1.004 0 011.42-1.42l4 4a.997.997 0 01.219 1.095.999.999 0 01-.22.325l-4 4A1 1 0 0110 17z',
+  check: 'M9 16.2l-3.5-3.5a1 1 0 00-1.4 1.4l4.19 4.19c.39.39 1.02.39 1.41 0L20.3 7.7a1 1 0 00-1.4-1.4L9 16.2z',
+  info: 'M12 2a10 10 0 100 20 10 10 0 000-20zm0 3.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm2 12h-4a1 1 0 010-2h1v-3h-1a1 1 0 010-2h2a1 1 0 011 1v4h1a1 1 0 010 2z',
+  voice: 'M12 2a1 1 0 00-1 1v18a1 1 0 002 0V3a1 1 0 00-1-1zM4 9a1 1 0 00-1 1v4a1 1 0 102 0v-4a1 1 0 00-1-1zm4-3a1 1 0 00-1 1v10a1 1 0 102 0V7a1 1 0 00-1-1zm12 3a1 1 0 00-1 1v4a1 1 0 002 0v-4a1 1 0 00-1-1zm-4-3a1 1 0 00-1 1v10a1 1 0 002 0V7a1 1 0 00-1-1z',
+  mic: 'M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 11-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z',
+  send: 'M2.01 21L23 12 2.01 3 2 10l15 2-15 2z',
+  chat: 'M15 4H9a7 7 0 00-1 13.92V20a1.5 1.5 0 002.4 1.2l4.27-3.2H15a7 7 0 000-14zm-7 8a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2z',
+  beauty: 'M18 11H16C15.2044 11 14.4413 11.3161 13.8787 11.8787C13.3161 12.4413 13 13.2043 13 14V20C13 20.2652 13.1054 20.5196 13.2929 20.7071C13.4804 20.8946 13.7348 21 14 21H20C20.2652 21 20.5196 20.8946 20.7071 20.7071C20.8946 20.5196 21 20.2652 21 20V14C21 13.2043 20.6839 12.4413 20.1213 11.8787C19.5587 11.3161 18.7956 11 18 11ZM10 3.99998C9.99944 3.81532 9.94776 3.63441 9.85068 3.47732C9.7536 3.32023 9.61491 3.19308 9.45 3.10998C9.29018 3.03549 9.1135 3.00458 8.93789 3.02038C8.76227 3.03619 8.59395 3.09815 8.45 3.19998L4.45 6.19998C4.31657 6.28771 4.20608 6.40612 4.12779 6.5453C4.0495 6.68449 4.00568 6.84039 4 6.99998V11H10V3.99998ZM10 13H4C3.73478 13 3.48043 13.1053 3.29289 13.2929C3.10536 13.4804 3 13.7348 3 14V20C3 20.2652 3.10536 20.5196 3.29289 20.7071C3.48043 20.8946 3.73478 21 4 21H10C10.2652 21 10.5196 20.8946 10.7071 20.7071C10.8946 20.5196 11 20.2652 11 20V14C11 13.7348 10.8946 13.4804 10.7071 13.2929C10.5196 13.1053 10.2652 13 10 13Z',
+  hairDresser: 'M21.5799 6.19003C21.4517 6.09711 21.3033 6.03596 21.1468 6.01162C20.9903 5.98728 20.8303 6.00044 20.6799 6.05003L16.4599 7.46003L15.9999 11.12C15.9822 11.2695 15.9309 11.4131 15.8499 11.54L19.3699 10.54C20.131 10.3118 20.7981 9.84396 21.272 9.20615C21.7458 8.56833 22.0011 7.7946 21.9999 7.00003C21.9992 6.84138 21.9607 6.68518 21.8877 6.54434C21.8147 6.40349 21.7092 6.28205 21.5799 6.19003ZM12.7799 15.25L13.0499 12.6L14.4499 11.89C14.5962 11.8158 14.7219 11.7068 14.8161 11.5725C14.9103 11.4382 14.97 11.2828 14.9899 11.12L15.9899 3.12003C16.007 2.98045 15.9945 2.83884 15.9531 2.70443C15.9118 2.57003 15.8425 2.44586 15.7499 2.34003C15.6562 2.23336 15.5409 2.14787 15.4116 2.08925C15.2822 2.03062 15.1419 2.00021 14.9999 2.00003C14.2034 1.9965 13.4344 2.2911 12.844 2.82591C12.2537 3.36071 11.8848 4.09701 11.8099 4.89003L11.2099 10.8L8.43994 11.61C7.9846 10.9065 7.2913 10.3903 6.48674 10.1557C5.68217 9.92118 4.82008 9.98398 4.05801 10.3327C3.29593 10.6813 2.68477 11.2926 2.33621 12.0547C1.98765 12.8168 1.92497 13.6789 2.15962 14.4835C2.39428 15.288 2.91059 15.9812 3.61422 16.4365C4.31784 16.8917 5.16179 17.0785 5.99181 16.9628C6.82184 16.8471 7.58252 16.4366 8.13484 15.8064C8.68716 15.1761 8.99423 14.3681 8.99994 13.53L10.9999 12.94L10.7899 15.07C9.96105 15.2376 9.2202 15.698 8.7029 16.367C8.18561 17.036 7.92644 17.8689 7.97282 18.7133C8.0192 19.5577 8.36802 20.3571 8.95547 20.9654C9.54292 21.5738 10.3297 21.9502 11.172 22.026C12.0143 22.1018 12.8557 21.8719 13.5423 21.3783C14.2289 20.8846 14.7149 20.1603 14.9113 19.3377C15.1077 18.5152 15.0014 17.6494 14.6119 16.8988C14.2223 16.1482 13.5756 15.5629 12.7899 15.25H12.7799ZM5.49994 15C5.20327 15 4.91326 14.9121 4.66659 14.7472C4.41991 14.5824 4.22765 14.3481 4.11412 14.0741C4.00059 13.8 3.97088 13.4984 4.02876 13.2074C4.08664 12.9164 4.2295 12.6491 4.43928 12.4394C4.64906 12.2296 4.91633 12.0867 5.20731 12.0289C5.49828 11.971 5.79988 12.0007 6.07397 12.1142C6.34805 12.2277 6.58232 12.42 6.74714 12.6667C6.91197 12.9134 6.99994 13.2034 6.99994 13.5C6.99994 13.8979 6.84191 14.2794 6.5606 14.5607C6.2793 14.842 5.89777 15 5.49994 15ZM11.4999 20C11.2033 20 10.9133 19.9121 10.6666 19.7472C10.4199 19.5824 10.2277 19.3481 10.1141 19.0741C10.0006 18.8 9.97088 18.4984 10.0288 18.2074C10.0866 17.9164 10.2295 17.6492 10.4393 17.4394C10.6491 17.2296 10.9163 17.0867 11.2073 17.0289C11.4983 16.971 11.7999 17.0007 12.074 17.1142C12.3481 17.2277 12.5823 17.42 12.7471 17.6667C12.912 17.9134 12.9999 18.2034 12.9999 18.5C12.9999 18.8979 12.8419 19.2794 12.5606 19.5607C12.2793 19.842 11.8978 20 11.4999 20Z',
+  beautyProducts: 'M9 4.00008C9.00045 3.80064 8.94124 3.60562 8.83 3.44008C8.71858 3.27853 8.56208 3.15333 8.38 3.08008C8.19898 2.99615 7.99699 2.96829 7.8 3.00008C7.60716 3.03801 7.42977 3.13192 7.29 3.27008L5.29 5.27008C5.19646 5.36135 5.12172 5.47007 5.07 5.59008C5.02007 5.72086 4.99629 5.86015 5 6.00008V10.0001H9V4.00008ZM4 19.0001C4 19.5305 4.21071 20.0392 4.58579 20.4143C4.96086 20.7894 5.46957 21.0001 6 21.0001H8C8.53043 21.0001 9.03914 20.7894 9.41421 20.4143C9.78929 20.0392 10 19.5305 10 19.0001V12.0001H4V19.0001ZM14 19.0001C14 19.5305 14.2107 20.0392 14.5858 20.4143C14.9609 20.7894 15.4696 21.0001 16 21.0001C16.5304 21.0001 17.0391 20.7894 17.4142 20.4143C17.7893 20.0392 18 19.5305 18 19.0001V12.0001H14V19.0001ZM20.89 5.56008C20.391 4.7135 19.6677 4.02134 18.8 3.56008C17.9265 3.14736 16.9651 2.95508 16 3.00008C15.0286 2.96954 14.0642 3.17544 13.19 3.60008C12.3192 4.0607 11.5925 4.75279 11.09 5.60008C11.0198 5.7605 10.989 5.93534 11 6.11008C11.0206 6.28531 11.0822 6.45321 11.18 6.60008L13.74 10.0001H18.25L20.8 6.61008C20.9114 6.45745 20.9804 6.27804 21 6.09008C21.0128 5.90666 20.9747 5.72328 20.89 5.56008Z',
+};
+const svg = (d, w=18, h=18) => `<svg viewBox="0 0 24 24" fill="none" width="${w}" height="${h}"><path d="${d}" fill="currentColor"/></svg>`;
+const AVATAR = `<div class="msg-avatar">${svg(IC.chat,16,16)}</div>`;
+
+// === USER MEMORY ===
+const user = { name: 'Shreya', skinType: 'Combination-Oily', concerns: ['Pigmentation','Sun Protection'], budget: 500, address: 'B-204, Lodha Palava, Dombivli East' };
+let isNewUser = false;
+
+// === UTILITIES ===
+function scroll() { CC.scrollTo({ top: CC.scrollHeight, behavior: 'smooth' }); }
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+function addAI(html, noAv) {
+  const r = document.createElement('div'); r.className = 'msg-row ai fade-in';
+  r.innerHTML = `${noAv ? '<div style="width:28px;flex-shrink:0"></div>' : AVATAR}<div class="msg-content"><div class="msg-bubble">${html}</div></div>`;
+  CC.appendChild(r); scroll(); return r;
+}
+function addUser(text) {
+  const r = document.createElement('div'); r.className = 'msg-row user fade-in';
+  r.innerHTML = `<div class="msg-bubble">${text}</div>`;
+  CC.appendChild(r); scroll();
+}
+function addVoiceUser(text) {
+  const r = document.createElement('div'); r.className = 'msg-row user fade-in';
+  r.innerHTML = `<div class="voice-bubble"><div class="voice-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="voice-label">${text}</div></div>`;
+  CC.appendChild(r); scroll();
+}
+function addCard(html, noAv) {
+  const r = document.createElement('div'); r.className = 'msg-row ai fade-in';
+  r.innerHTML = `${noAv ? '<div style="width:28px;flex-shrink:0"></div>' : AVATAR}<div class="msg-content card-wrap">${html}</div>`;
+  CC.appendChild(r); scroll();
+}
+function addChips(chips) {
+  const r = document.createElement('div'); r.className = 'chip-row fade-in'; r.style.paddingLeft = '36px';
+  r.innerHTML = chips.map(c => `<button class="chip ${c.style}" onclick="${c.action}">${c.label}</button>`).join('');
+  CC.appendChild(r); scroll();
+}
+function showTyping() {
+  const r = document.createElement('div'); r.className = 'typing-row fade-in'; r.id = 'typingRow';
+  r.innerHTML = `${AVATAR}<div class="typing-dots"><span></span><span></span><span></span></div>`;
+  CC.appendChild(r); scroll();
+}
+function hideTyping() { const e = document.getElementById('typingRow'); if(e) e.remove(); }
+function clearChips() { document.querySelectorAll('.chip-row').forEach(r => r.remove()); }
+
+// === PRODUCT DATA ===
+const products = {
+  minimalistSPF: { name: 'Minimalist SPF 50 Sunscreen', variant: 'Sunscreen \u00b7 50 ml', price: 399, mrp: 499, rating: 4.5, badge: 'Bestseller', bg: '#fff0e6', color: '#d95c00', abbr: 'M' },
+  dotkey: { name: 'Dot & Key CICA Calming Moisturizer', variant: 'Face Cream \u00b7 60 ml', price: 545, mrp: 695, rating: 4.3, badge: '', bg: '#e6f4e6', color: '#1b7a1b', abbr: 'D&K' },
+  cetaphil: { name: 'Cetaphil Moisturizing Lotion', variant: 'Body Lotion \u00b7 200 ml', price: 375, mrp: 450, rating: 4.6, badge: 'Derma Pick', bg: '#e3f2fd', color: '#1565c0', abbr: 'C' },
+  minimalistNiac: { name: 'Minimalist 10% Niacinamide Serum', variant: 'Face Serum \u00b7 30 ml', price: 549, mrp: 649, rating: 4.7, badge: 'Bestseller', bg: '#fff0e6', color: '#d95c00', abbr: 'M' },
+  dotkeyVitC: { name: 'Dot & Key Vitamin C+E Serum', variant: 'Glow Serum \u00b7 20 ml', price: 495, mrp: 595, rating: 4.4, badge: '', bg: '#e6f4e6', color: '#1b7a1b', abbr: 'D&K' },
+  laShield: { name: 'La Shield Probiotic SPF 50', variant: 'Sunscreen \u00b7 50 g', price: 399, mrp: 399, rating: 4.3, badge: '', bg: '#fff9c4', color: '#9e7700', abbr: 'LS' },
+  neutrogena: { name: 'Neutrogena Ultra Sheer SPF 50+', variant: 'Sunscreen \u00b7 30 ml', price: 499, mrp: 599, rating: 4.2, badge: '', bg: '#e3f2fd', color: '#1565c0', abbr: 'N' },
+  // Hair products
+  lorealShampoo: { name: "L'Or\u00e9al Hyaluron Moisture Shampoo", variant: 'Shampoo \u00b7 340 ml', price: 375, mrp: 450, rating: 4.4, badge: 'Bestseller', bg: '#e3f2fd', color: '#1565c0', abbr: "L'O" },
+  streaxSerum: { name: 'Streax Professional Hair Serum', variant: 'Hair Serum \u00b7 100 ml', price: 295, mrp: 350, rating: 4.2, badge: '', bg: '#e8e8fc', color: '#3535f3', abbr: 'ST' },
+  doveConditioner: { name: 'Dove Hair Fall Rescue Conditioner', variant: 'Conditioner \u00b7 180 ml', price: 199, mrp: 250, rating: 4.3, badge: '', bg: '#e8faf7', color: '#0e5c4f', abbr: 'DV' },
+  tresemmeKeratin: { name: 'TRESemm\u00e9 Keratin Smooth Shampoo', variant: 'Shampoo \u00b7 580 ml', price: 485, mrp: 570, rating: 4.3, badge: '', bg: '#e3f2fd', color: '#1565c0', abbr: 'TR' },
+  matrixOil: { name: 'Matrix Biolage Smoothing Hair Oil', variant: 'Hair Oil \u00b7 100 ml', price: 345, mrp: 425, rating: 4.1, badge: '', bg: '#fef7e9', color: '#ac660c', abbr: 'MX' },
+  // Makeup products
+  macLipstick: { name: 'MAC Matte Lipstick \u2014 Ruby Woo', variant: 'Lipstick \u00b7 3 g', price: 1750, mrp: 1750, rating: 4.8, badge: 'Iconic', bg: '#ffebee', color: '#c62828', abbr: 'MAC' },
+  lakmeFdn: { name: 'Lakm\u00e9 9to5 Primer+Matte Foundation', variant: 'Foundation \u00b7 25 ml', price: 599, mrp: 750, rating: 4.3, badge: 'Bestseller', bg: '#fff0e6', color: '#d95c00', abbr: 'LK' },
+  maybellineConcealer: { name: 'Maybelline Fit Me Concealer', variant: 'Concealer \u00b7 6.8 ml', price: 499, mrp: 549, rating: 4.5, badge: '', bg: '#fef7e9', color: '#ac660c', abbr: 'MB' },
+  nykaaEyeliner: { name: 'Nykaa Glamoreyes Eyeliner \u2014 Black', variant: 'Eyeliner \u00b7 1 ml', price: 249, mrp: 299, rating: 4.4, badge: '', bg: '#141414', color: '#ffffff', abbr: 'NK' },
+  forestKajal: { name: 'Forest Essentials Kajal', variant: 'Kajal \u00b7 3 g', price: 695, mrp: 695, rating: 4.6, badge: 'Luxe', bg: '#141414', color: '#ffffff', abbr: 'FE' },
+  maybellineFdn: { name: 'Maybelline Fit Me Foundation', variant: 'Foundation \u00b7 30 ml', price: 450, mrp: 525, rating: 4.4, badge: '', bg: '#fef7e9', color: '#ac660c', abbr: 'MB' },
+};
+
+function prodThumb(p) { return `<div class="prod-thumb" style="background:${p.bg};color:${p.color}">${p.abbr}</div>`; }
+function prodRow(p) {
+  return `<div class="prod-row">${prodThumb(p)}<div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-variant">${p.variant}</div><div class="prod-meta"><div class="prod-rating">${svg(IC.star,12,12)} ${p.rating}</div>${p.badge ? `<span class="prod-badge">${p.badge}</span>` : ''}</div></div><div class="prod-price-col"><div class="prod-price">\u20b9${p.price}</div>${p.mrp > p.price ? `<div class="prod-mrp">\u20b9${p.mrp}</div>` : ''}</div></div>`;
+}
+
+// === ELEVENLABS TTS ===
+const TTS_KEY = 'sk_86a2daf2318ba84afa5190ff9a2c09fcc9e7f9dafea1fe79';
+const TTS_VOICE = '21m00Tcm4TlvDq8ikWAM'; // Rachel
+let currentAudio = null;
+
+async function speakText(text, btn) {
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  document.querySelectorAll('.tts-btn.playing').forEach(b => b.classList.remove('playing'));
+  if (btn) btn.classList.add('playing');
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${TTS_VOICE}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'xi-api-key': TTS_KEY },
+      body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2', voice_settings: { stability: 0.5, similarity_boost: 0.75 } })
+    });
+    if (!res.ok) throw new Error('TTS failed');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => { if(btn) btn.classList.remove('playing'); currentAudio = null; };
+    currentAudio.play();
+  } catch(e) { console.log('TTS error:', e); if(btn) btn.classList.remove('playing'); }
+}
+
+function toggleSendBtn() {
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const speakBtn = document.getElementById('speakBtn');
+  if (input && sendBtn && speakBtn) {
+    if (input.value.trim()) {
+      sendBtn.classList.remove('hidden-send');
+      speakBtn.style.display = 'none';
+    } else {
+      sendBtn.classList.add('hidden-send');
+      speakBtn.style.display = '';
+    }
+  }
+}
+
+// === ROUTING ===
+function handleSend() {
+  const text = chatInput.value.trim(); if (!text) return; chatInput.value = '';
+  const lower = text.toLowerCase();
+  if (lower.includes('shampoo') || lower.includes('hair') || lower.includes('conditioner') || lower.includes('baal')) {
+    addUser(text); activeCat = 'hair';
+    if (lower.includes('suggest') || lower.includes('recommend') || lower.includes('dry')) startHairAdvisor();
+    else startHairOrder();
+  } else if (lower.includes('lipstick') || lower.includes('foundation') || lower.includes('kajal') || lower.includes('eyeliner') || lower.includes('makeup') || lower.includes('mac')) {
+    addUser(text); activeCat = 'makeup';
+    if (lower.includes('suggest') || lower.includes('recommend')) startMakeupAdvisor();
+    else startMakeupOrder();
+  } else if (lower.includes('sunscreen') || lower.includes('moistur') || lower.includes('serum') || lower.includes('order')) {
+    addUser(text); activeCat = 'skin'; runFlow1Fresh();
+  } else if (lower.includes('repeat') || lower.includes('last order') || lower.includes('reorder')) {
+    addUser(text); runFlow1Reorder();
+  } else if (lower.includes('refill') || lower.includes('restock') || lower.includes('running low') || lower.includes('replenish') || lower.includes('alert')) {
+    addUser(text); startFlow2();
+  } else if (lower.includes('skin') || lower.includes('sunscreen') && lower.includes('recommend')) {
+    addUser(text); activeCat = 'skin'; runFlow3();
+  } else if (lower.includes('recommend') || lower.includes('suggest') || lower.includes('advisor') || lower.includes('mere liye')) {
+    addUser(text); // Ambiguous — use current category
+    if (activeCat === 'hair') startHairAdvisor();
+    else if (activeCat === 'makeup') startMakeupAdvisor();
+    else runFlow3();
+  } else {
+    addUser(text); showTyping();
+    setTimeout(() => { hideTyping();
+      addAI('I can help with that! You can order beauty products, check refill alerts, or get personalised skin recommendations.');
+      showWelcomeCards();
+    }, 1000);
+  }
+}
+
+// === WELCOME ===
+let onboarded = false;
+function showWelcomeCards() {
+  addCard(`<div class="cat-cards">
+    <div class="cat-card" onclick="selectCategory('skin')">
+      <div class="cat-card-icon" style="background:var(--primary-20)">${svg(IC.beauty,22,22)}</div>
+      <div class="cat-card-text"><div class="cat-card-title">Skin & Body</div><div class="cat-card-sub">Sunscreen, moisturizer, serums & more</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+    <div class="cat-card" onclick="selectCategory('hair')">
+      <div class="cat-card-icon" style="background:var(--sparkle-20)">${svg(IC.hairDresser,22,22)}</div>
+      <div class="cat-card-text"><div class="cat-card-title">Hair Care</div><div class="cat-card-sub">Shampoo, conditioner, serums & oils</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+    <div class="cat-card" onclick="selectCategory('makeup')">
+      <div class="cat-card-icon" style="background:var(--secondary-20)">${svg(IC.beautyProducts,22,22)}</div>
+      <div class="cat-card-text"><div class="cat-card-title">Makeup & Fragrance</div><div class="cat-card-sub">Lipstick, foundation, kajal & perfumes</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+    <div class="cat-card" onclick="directAdvisor()">
+      <div class="cat-card-icon" style="background:var(--primary-20)">${svg(IC.star,22,22)}</div>
+      <div class="cat-card-text"><div class="cat-card-title">AI Beauty Advisor</div><div class="cat-card-sub">Ask me anything about skin, hair, or makeup</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+  </div>`, true);
+  if (!onboarded) {
+    addChips([{ label: "I'm new to Tira", style: 'chip-outline', action: 'startNewUser()' }]);
+  }
+}
+
+function selectCategory(cat) {
+  clearChips(); activeCat = cat; onboarded = true;
+  const names = { skin: 'Skin & Body', hair: 'Hair Care', makeup: 'Makeup & Fragrance' };
+  addUser(names[cat]);
+  addAI(`Great choice! What would you like to do with ${names[cat]}?`, true);
+  addChips([
+    { label: 'Order products', style: 'chip-primary', action: `catFlow('order')` },
+    { label: 'Refill alerts', style: 'chip-sparkle', action: `catFlow('refill')` },
+  ]);
+}
+
+function directAdvisor() {
+  clearChips(); onboarded = true;
+  addUser('AI Beauty Advisor');
+  addAI('I\'m your personal beauty assistant! What area would you like advice on?', true);
+  addChips([
+    { label: 'AI Skin Advisor', style: 'chip-primary', action: "activeCat='skin';startFlow3Entry()" },
+    { label: 'AI Hair Advisor', style: 'chip-sparkle', action: "activeCat='hair';startHairAdvisor()" },
+    { label: 'AI Makeup Advisor', style: 'chip-secondary', action: "activeCat='makeup';startMakeupAdvisor()" },
+  ]);
+}
+
+function catFlow(type) {
+  clearChips();
+  if (activeCat === 'skin') {
+    if (type === 'order') startFlow1();
+    else if (type === 'refill') startFlow2();
+    else startFlow3Entry();
+  } else if (activeCat === 'hair') {
+    if (type === 'order') startHairOrder();
+    else if (type === 'refill') startHairRefill();
+    else startHairAdvisor();
+  } else {
+    if (type === 'order') startMakeupOrder();
+    else if (type === 'refill') startMakeupRefill();
+    else startMakeupAdvisor();
+  }
+}
+
+// ============================================================
+// FLOW 1: VOICE-FIRST ORDER PROCESSING
+// ============================================================
+function startFlow1() {
+  clearChips();
+  addAI('How would you like to order?', true);
+  const chips = [{ label: 'Order beauty essentials', style: 'chip-primary', action: 'triggerFreshOrder()' }];
+  if (!isNewUser) chips.push({ label: 'Repeat my last order', style: 'chip-secondary', action: 'triggerReorder()' });
+  addChips(chips);
+}
+
+async function triggerFreshOrder() {
+  clearChips();
+  addVoiceUser('Minimalist sunscreen aur Dot & Key moisturizer order karo');
+  await delay(400);
+  runFlow1Fresh();
+}
+
+async function runFlow1Fresh() {
+  showTyping(); await delay(1400); hideTyping();
+  addAI(`Found your items on Tira, ${user.name}! Here's what I've picked:`);
+  await delay(600);
+
+  const p1 = products.minimalistSPF, p2 = products.dotkey;
+  const total = p1.price + p2.price;
+  const saved = (p1.mrp - p1.price) + (p2.mrp - p2.price);
+
+  addCard(`<div class="cart-card">
+    <div class="cart-header"><div class="cart-header-left">${svg(IC.cart)} <span>Your Beauty Cart</span></div><span class="cart-count">2 items</span></div>
+    ${prodRow(p1)}${prodRow(p2)}
+    <div class="cart-total"><div class="cart-total-left"><div class="cart-total-label">Total</div><div class="cart-total-sub">2 items \u00b7 Save \u20b9${saved}</div></div><div class="cart-total-price">\u20b9${total}</div></div>
+    <div class="cart-delivery">${svg(IC.cart,14,14)} Tira delivers in 2-3 days to Lodha Palava</div>
+  </div>`, true);
+  await delay(500);
+  addAI("Everything's added. Should I place the order?", true);
+  addChips([
+    { label: `Place order \u2014 \u20b9${total}`, style: 'chip-primary', action: `confirmOrder(${total},'2 items \u00b7 Beauty Essentials','flow1')` },
+    { label: 'Edit cart', style: 'chip-secondary', action: 'editCart()' },
+  ]);
+}
+
+async function triggerReorder() {
+  clearChips();
+  addVoiceUser('Mera last month wala order repeat karo');
+  await delay(400);
+  runFlow1Reorder();
+}
+
+async function runFlow1Reorder() {
+  showTyping(); await delay(1200); hideTyping();
+  addAI(`Your last Tira order (3 weeks ago) had these items:`);
+  await delay(600);
+
+  const items = [products.cetaphil, products.minimalistNiac, products.dotkeyVitC];
+  const total = items.reduce((s,p) => s + p.price, 0);
+  const saved = items.reduce((s,p) => s + (p.mrp - p.price), 0);
+
+  addCard(`<div class="cart-card">
+    <div class="cart-header"><div class="cart-header-left">${svg(IC.cart)} <span>Previous Order</span></div><span class="cart-count">3 items</span></div>
+    ${items.map(p => prodRow(p)).join('')}
+    <div class="cart-total"><div class="cart-total-left"><div class="cart-total-label">Total</div><div class="cart-total-sub">3 items \u00b7 Save \u20b9${saved}</div></div><div class="cart-total-price">\u20b9${total}</div></div>
+    <div class="cart-delivery">${svg(IC.cart,14,14)} Tira delivers in 2-3 days</div>
+  </div>`, true);
+  await delay(400);
+  addAI('Want me to reorder all of these?', true);
+  addChips([
+    { label: `Reorder all \u2014 \u20b9${total}`, style: 'chip-primary', action: `confirmOrder(${total},'3 items \u00b7 Reorder','flow1')` },
+    { label: 'Just the moisturizer', style: 'chip-secondary', action: `confirmOrder(375,'Cetaphil Lotion','flow1')` },
+    { label: 'Edit items', style: 'chip-secondary', action: 'editCart()' },
+  ]);
+}
+
+// === SHARED PAYMENT FLOW ===
+async function confirmOrder(amount, summary, flow) {
+  clearChips(); addUser('Place order');
+  showTyping(); await delay(1000); hideTyping();
+  addAI('Choose how you\'d like to pay:');
+  await delay(500);
+
+  addCard(`<div class="payment-card" id="payCard">
+    <div class="pay-header">${svg(IC.cart,20,20)}<div class="pay-header-text"><div class="pay-header-title">Choose payment method</div><div class="pay-header-sub">${summary}</div></div></div>
+    <div class="pay-amount"><span class="pay-amount-label">Total payable</span><span class="pay-amount-val">\u20b9${amount}</span></div>
+    <div class="pay-methods">
+      <div class="pay-method selected" onclick="selectPay(this)"><div class="pay-method-icon" style="background:var(--primary-20);color:var(--primary-50)">UPI</div><div class="pay-method-info"><div class="pay-method-name">JioPay UPI<span class="pay-method-tag" style="background:var(--sparkle-20);color:var(--sparkle-70)">Fastest</span></div><div class="pay-method-detail">shreya@jio \u00b7 Instant payment</div></div><div class="pay-radio"></div></div>
+      <div class="pay-method" onclick="selectPay(this)"><div class="pay-method-icon" style="background:var(--grey-20);color:var(--text-high)">CARD</div><div class="pay-method-info"><div class="pay-method-name">Credit / Debit Card</div><div class="pay-method-detail">HDFC \u2022\u2022\u2022\u2022 4829</div></div><div class="pay-radio"></div></div>
+      <div class="pay-method" onclick="selectPay(this)"><div class="pay-method-icon" style="background:var(--secondary-20);color:var(--secondary-60)">COD</div><div class="pay-method-info"><div class="pay-method-name">Cash on Delivery</div><div class="pay-method-detail">Pay when order arrives</div></div><div class="pay-radio"></div></div>
+    </div>
+    <div class="pay-footer"><button class="pay-btn" onclick="processPayment(${amount},'${flow}')">Pay \u20b9${amount}</button><div class="pay-secured">${svg(IC.check,12,12)} Secured by Jio Payments Bank</div></div>
+  </div>`, true);
+}
+
+function selectPay(el) { document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected')); el.classList.add('selected'); }
+
+async function processPayment(amount, flow) {
+  const sel = document.querySelector('.pay-method.selected .pay-method-name');
+  const method = sel ? sel.childNodes[0].textContent.trim() : 'JioPay UPI';
+  addUser('Pay with ' + method);
+  showTyping(); await delay(1500); hideTyping();
+
+  const orderId = 'TIRA-' + (48291 + Math.floor(Math.random()*100));
+
+  addCard(`<div class="confirm-card">
+    <div class="confirm-icon">${svg(IC.check,28,28)}</div>
+    <div class="confirm-title">Payment Successful!</div>
+    <div class="confirm-sub">\u20b9${amount} paid via ${method}</div>
+    <div class="confirm-id">ORDER #${orderId}</div>
+    <div class="confirm-eta">${svg(IC.cart,16,16)} <span>Estimated delivery: Apr 11-12</span></div>
+  </div>`, true);
+
+  await delay(800);
+  addCard(`<div class="track-card">
+    <div class="track-header">${svg(IC.info,18,18)} <span>Live Tracking</span></div>
+    <div class="track-steps">
+      <div class="track-step"><div class="track-dot-col"><div class="track-dot done"></div><div class="track-line done"></div></div><div class="track-step-info"><div class="track-step-title">Order Confirmed</div><div class="track-step-sub">7:30 PM</div></div></div>
+      <div class="track-step"><div class="track-dot-col"><div class="track-dot current"></div><div class="track-line"></div></div><div class="track-step-info"><div class="track-step-title">Being Packed</div><div class="track-step-sub">Estimated 2 hours</div></div></div>
+      <div class="track-step"><div class="track-dot-col"><div class="track-dot"></div><div class="track-line"></div></div><div class="track-step-info"><div class="track-step-title">Shipped</div><div class="track-step-sub">\u2014</div></div></div>
+      <div class="track-step"><div class="track-dot-col"><div class="track-dot"></div></div><div class="track-step-info"><div class="track-step-title">Delivered</div><div class="track-step-sub">\u2014</div></div></div>
+    </div>
+  </div>`, true);
+
+  await delay(600);
+  const msg = 'Your Tira order is on its way! I\'ll keep you posted on the delivery.';
+  addAI(msg, true);
+  await delay(400);
+  // Category-aware post-payment chips
+  const refillAction = activeCat === 'hair' ? 'startHairRefill()' : activeCat === 'makeup' ? 'startMakeupRefill()' : 'startFlow2()';
+  const recoAction = activeCat === 'hair' ? 'startHairAdvisor()' : activeCat === 'makeup' ? 'startMakeupAdvisor()' : 'startFlow3Entry()';
+  const advisorLabel = activeCat === 'hair' ? 'AI Hair Advisor' : activeCat === 'makeup' ? 'AI Makeup Advisor' : 'AI Skin Advisor';
+  addChips([
+    { label: 'Check refill alerts', style: 'chip-sparkle', action: refillAction },
+    { label: advisorLabel, style: 'chip-secondary', action: recoAction },
+  ]);
+}
+
+function editCart() {
+  clearChips(); addUser('Edit cart'); showTyping();
+  const examples = {
+    skin: 'Say "remove sunscreen" or "add Vitamin C serum".',
+    hair: 'Say "remove shampoo" or "add a conditioner".',
+    makeup: 'Say "remove foundation" or "add kajal".',
+  };
+  setTimeout(() => { hideTyping();
+    addAI('What would you like to change? ' + (examples[activeCat] || examples.skin));
+  }, 800);
+}
+
+// ============================================================
+// FLOW 2: SMART REPLENISHMENT
+// ============================================================
+function startFlow2() {
+  clearChips();
+  if (activeCat === 'hair') { startHairRefill(); return; }
+  if (activeCat === 'makeup') { startMakeupRefill(); return; }
+  runFlow2();
+}
+
+async function runFlow2() {
+  showTyping(); await delay(1000); hideTyping();
+  addAI(`${user.name}, I've been tracking your beauty routine. Here's what needs attention:`);
+  await delay(1000);
+
+  // Alert 1: Auto-Replenish
+  addCard(`<div class="notif-card notif-replenish">
+    <div class="notif-accent">${svg(IC.refresh,16,16)} <span class="notif-accent-label">Auto-Replenish</span><span class="notif-accent-time">Just now</span></div>
+    <div class="notif-body">
+      <div class="notif-product">${prodThumb(products.cetaphil)}<div class="notif-product-info"><div class="notif-product-name">Cetaphil Moisturizing Lotion</div><div class="notif-product-detail">200 ml \u00b7 \u20b9375</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} You buy every 45 days. Last order was 40 days ago. You'll likely run out in ~5 days.</div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.check,16,16)} Yes, reorder</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Later</button></div>
+    </div>
+  </div>`, true);
+
+  await delay(800);
+  addChips([
+    { label: 'Show price alerts', style: 'chip-sparkle', action: 'showPriceAlerts()' },
+    { label: "That's enough", style: 'chip-secondary', action: 'skipAlerts()' },
+  ]);
+}
+
+async function showPriceAlerts() {
+  clearChips();
+  addUser('Show me deals');
+  showTyping(); await delay(800); hideTyping();
+  addAI('A deal you shouldn\'t miss:');
+  await delay(1000);
+
+  // Alert 2: Price Drop
+  addCard(`<div class="notif-card notif-pricedrop">
+    <div class="notif-accent">${svg(IC.star,16,16)} <span class="notif-accent-label">Price Drop</span><span class="notif-accent-time">5 min ago</span></div>
+    <div class="notif-body">
+      <div class="notif-product">${prodThumb(products.laShield)}<div class="notif-product-info"><div class="notif-product-name">La Shield Probiotic SPF 50</div><div class="notif-product-detail">Sunscreen \u00b7 50 g</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} Tira Luxe Sale! Price just dropped 30% \u2014 lowest in 3 months. Great time to stock up.</div>
+      <div class="notif-price"><span class="notif-price-now">\u20b9279</span><span class="notif-price-was">\u20b9399</span><span class="notif-price-save">Save \u20b9120</span></div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.cart,16,16)} Order now \u2014 \u20b9279</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Skip</button></div>
+    </div>
+  </div>`, true);
+
+  await delay(800);
+  addChips([
+    { label: 'Show bundle deal', style: 'chip-sparkle', action: 'showBundleDeal()' },
+    { label: "That's enough", style: 'chip-secondary', action: 'skipAlerts()' },
+  ]);
+}
+
+async function showBundleDeal() {
+  clearChips();
+  addUser('Show me the bundle');
+  showTyping(); await delay(800); hideTyping();
+  addAI('Even better \u2014 there\'s a combo deal:');
+  await delay(1000);
+
+  // Alert 3: Bundle
+  addCard(`<div class="notif-card notif-bundle">
+    <div class="notif-accent">${svg(IC.star,16,16)} <span class="notif-accent-label">Bundle Deal</span><span class="notif-accent-time">Just now</span></div>
+    <div class="notif-body">
+      <div class="notif-product"><div class="prod-thumb" style="background:var(--secondary-20);color:var(--secondary-60);font-size:10px;font-weight:900">2in1</div><div class="notif-product-info"><div class="notif-product-name">Sunscreen + Moisturizer Combo</div><div class="notif-product-detail">La Shield SPF 50 + Cetaphil Lotion</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} Save \u20b9200 when you buy both together on Tira. Your two most-used products, bundled!</div>
+      <div class="notif-price"><span class="notif-price-now">\u20b9454</span><span class="notif-price-was">\u20b9654</span><span class="notif-price-save" style="background:var(--secondary-20);color:var(--secondary-60)">Save \u20b9200</span></div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.cart,16,16)} Grab the bundle \u2014 \u20b9454</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Skip</button></div>
+    </div>
+  </div>`, true);
+
+  await delay(800);
+  const msg = "That's all your beauty alerts for now. I'll keep watching prices and your routine!";
+  addAI(msg, true);
+  await delay(400);
+  addChips([
+    { label: 'Back to categories', style: 'chip-secondary', action: 'backToHome()' },
+  ]);
+}
+
+function confirmNotif(btn) {
+  const card = btn.closest('.notif-card');
+  const actions = card.querySelector('.notif-actions');
+  const isReplenish = card.classList.contains('notif-replenish');
+  const msg = isReplenish ? 'Order placed! Arriving in 2-3 days' : 'Order placed! Arriving in 2-3 days';
+  actions.innerHTML = `<div style="display:flex;align-items:center;gap:6px;color:var(--success);font-size:13px;font-weight:700">${svg(IC.check,16,16)} ${msg}</div>`;
+  card.style.opacity = '0.85';
+}
+function dismissNotif(btn) {
+  const card = btn.closest('.notif-card');
+  card.style.transition = 'opacity 0.3s, transform 0.3s';
+  card.style.opacity = '0.4'; card.style.transform = 'scale(0.97)';
+  const actions = card.querySelector('.notif-actions');
+  actions.innerHTML = `<span style="font-size:12px;font-weight:500;color:var(--text-low)">Dismissed \u2014 I'll remind you later</span>`;
+}
+function skipAlerts() {
+  clearChips(); addUser('Skip for now'); showTyping();
+  setTimeout(() => { hideTyping();
+    addAI('No problem! I\'ll check in again when your products are running low. Just say "refill alerts" anytime.');
+  }, 800);
+}
+
+// ============================================================
+// FLOW 3: AI SKIN ADVISOR
+// ============================================================
+function startFlow3Entry() {
+  clearChips();
+  if (activeCat === 'hair') { startHairAdvisor(); return; }
+  if (activeCat === 'makeup') { startMakeupAdvisor(); return; }
+  addUser('Mere liye sunscreen recommend karo, combination oily skin hai');
+  runFlow3();
+}
+
+async function runFlow3() {
+  showTyping(); await delay(1200); hideTyping();
+
+  const msg = `I see you have ${user.skinType.toLowerCase()} skin \u2014 noted! Let me find the best options. Just a couple more details:`;
+  addAI(msg);
+  await delay(600);
+
+  // Visual Quiz Card
+  addCard(`<div class="quiz-card" id="quizCard">
+    <div class="quiz-title">Your Skin Concerns <span style="font-size:12px;font-weight:500;color:var(--text-low)">(select all that apply)</span></div>
+    <div class="quiz-chips" id="concernChips">
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Acne</button>
+      <button class="quiz-chip selected" onclick="toggleQuizChip(this)">Sun Protection</button>
+      <button class="quiz-chip selected" onclick="toggleQuizChip(this)">Pigmentation</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Anti-aging</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Dullness</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Dark Circles</button>
+    </div>
+    <div class="quiz-label">Budget per product</div>
+    <div class="quiz-slider-wrap">
+      <input type="range" class="quiz-slider" min="200" max="2000" step="100" value="500" oninput="updateBudget(this.value)">
+      <div class="quiz-budget-labels"><span>\u20b9200</span><span>\u20b92,000</span></div>
+      <div class="quiz-budget-val" id="budgetVal">\u20b9500</div>
+    </div>
+    <button class="quiz-submit" onclick="submitQuiz()">Find my perfect match</button>
+  </div>`, true);
+}
+
+function toggleQuizChip(el) { el.classList.toggle('selected'); }
+function updateBudget(val) { document.getElementById('budgetVal').textContent = '\u20b9' + parseInt(val).toLocaleString('en-IN'); }
+
+async function submitQuiz() {
+  const selected = [...document.querySelectorAll('#concernChips .quiz-chip.selected')].map(c => c.textContent);
+  const budget = document.querySelector('.quiz-slider').value;
+  clearChips();
+  addUser(`Concerns: ${selected.join(', ')} \u00b7 Budget: \u20b9${budget}`);
+  showTyping(); await delay(1800); hideTyping();
+
+  const msg = `Based on your ${user.skinType.toLowerCase()} skin with ${selected.join(' & ').toLowerCase()} concerns, here are my top 3 picks:`;
+  addAI(msg);
+  await delay(600);
+
+  // Comparison Table
+  addCard(`<div class="compare-card">
+    <div class="compare-title">${svg(IC.star)} Sunscreen Showdown</div>
+    <div class="compare-item">
+      <div class="compare-item-head">
+        <div class="compare-item-rank best">1</div>
+        <div class="compare-item-name">Minimalist SPF 50 PA++++</div>
+        <span class="compare-item-best-tag">Best Match</span>
+        <div class="compare-item-price">\u20b9399</div>
+      </div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Ingredient</div><div class="compare-detail-val">Niacinamide 10% + SPF 50</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Controls oil + fades dark spots</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.5</span></div></div>
+      </div>
+    </div>
+    <div class="compare-item">
+      <div class="compare-item-head">
+        <div class="compare-item-rank alt">2</div>
+        <div class="compare-item-name">La Shield Probiotic SPF 50</div>
+        <div class="compare-item-price">\u20b9399</div>
+      </div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Ingredient</div><div class="compare-detail-val">Probiotics + SPF 50</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Gut-skin barrier, no white cast</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.3</span></div></div>
+      </div>
+    </div>
+    <div class="compare-item">
+      <div class="compare-item-head">
+        <div class="compare-item-rank alt">3</div>
+        <div class="compare-item-name">Neutrogena Ultra Sheer SPF 50+</div>
+        <div class="compare-item-price">\u20b9499</div>
+      </div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Ingredient</div><div class="compare-detail-val">Helioplex Dry-Touch</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Lightweight, non-greasy finish</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.2</span></div></div>
+      </div>
+    </div>
+  </div>`, true);
+
+  await delay(600);
+
+  // Ingredient explainer
+  addCard(`<div class="ingredient-card">
+    <div class="ingredient-title">Why Minimalist is your #1 match</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Niacinamide 10%</b> \u2192 Controls excess oil on your T-zone</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>SPF 50 PA++++</b> \u2192 Maximum sun protection for Indian weather</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Lightweight gel formula</b> \u2192 Won't feel heavy on oily areas</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Bonus</b> \u2192 Helps fade dark spots (your pigmentation concern)</div>
+  </div>`, true);
+
+  await delay(500);
+  const recoMsg = 'My top pick is Minimalist SPF 50 \u2014 the Niacinamide helps with both oil control and pigmentation, exactly what your skin needs.';
+  addAI(recoMsg, true);
+  await delay(300);
+  addChips([
+    { label: 'Add Minimalist to cart \u2014 \u20b9399', style: 'chip-primary', action: 'addRecoToCart()' },
+    { label: 'Tell me about ingredients', style: 'chip-secondary', action: 'showIngredientDetail()' },
+    { label: 'Show more options', style: 'chip-secondary', action: 'showMoreOptions()' },
+  ]);
+}
+
+async function addRecoToCart() {
+  clearChips();
+  const recos = {
+    skin: { name: 'Minimalist SPF 50', price: 399 },
+    hair: { name: "L'Or\u00e9al Hyaluron Shampoo", price: 375 },
+    makeup: { name: 'Lakm\u00e9 9to5 Foundation', price: 599 },
+  };
+  const r = recos[activeCat] || recos.skin;
+  addUser(`Add ${r.name} to cart`);
+  showTyping(); await delay(800); hideTyping();
+  addAI('Added to your Tira cart! Want to checkout now or keep browsing?');
+  addChips([
+    { label: `Checkout \u2014 \u20b9${r.price}`, style: 'chip-primary', action: `confirmOrder(${r.price},'${r.name}','flow_${activeCat}')` },
+    { label: 'Keep browsing', style: 'chip-secondary', action: 'backToHome()' },
+  ]);
+}
+
+async function showIngredientDetail() {
+  clearChips(); addUser('Tell me more about ingredients');
+  showTyping(); await delay(1000); hideTyping();
+  addAI(`<b>Niacinamide (Vitamin B3)</b> \u2014 A multitasker that regulates sebum production, minimizes pores, and fades post-acne marks. Perfect for combination-oily skin.<br><br><b>Zinc Oxide + Titanium Dioxide</b> \u2014 Physical UV filters that sit on your skin and deflect UV rays. Less irritating than chemical sunscreens.<br><br><b>No parabens, no fragrance</b> \u2014 Safe for sensitive areas too.`);
+  await delay(300);
+  addChips([
+    { label: 'Add to cart \u2014 \u20b9399', style: 'chip-primary', action: 'addRecoToCart()' },
+    { label: 'Back to results', style: 'chip-secondary', action: 'backToHome()' },
+  ]);
+}
+
+async function showMoreOptions() {
+  clearChips(); addUser('Show more options');
+  showTyping(); await delay(1000); hideTyping();
+  if (activeCat === 'hair') {
+    addAI('Here are 2 more great options for your hair:');
+    await delay(500);
+    addCard(`<div class="cart-card">
+      ${prodRow(products.matrixOil)}
+      ${prodRow(products.doveConditioner)}
+    </div>`, true);
+    addChips([
+      { label: 'Add Matrix Oil \u2014 \u20b9345', style: 'chip-primary', action: 'addRecoToCart()' },
+      { label: 'Back to categories', style: 'chip-secondary', action: 'backToHome()' },
+    ]);
+  } else if (activeCat === 'makeup') {
+    addAI('Here are 2 more makeup options you might love:');
+    await delay(500);
+    addCard(`<div class="cart-card">
+      ${prodRow(products.nykaaEyeliner)}
+      ${prodRow(products.forestKajal)}
+    </div>`, true);
+    addChips([
+      { label: 'Add Nykaa Eyeliner \u2014 \u20b9249', style: 'chip-primary', action: 'addRecoToCart()' },
+      { label: 'Back to categories', style: 'chip-secondary', action: 'backToHome()' },
+    ]);
+  } else {
+    addAI('Here are 2 more great options for your skin type:');
+    await delay(500);
+    addCard(`<div class="cart-card">
+      ${prodRow({name:'Aqualogica Glow+ SPF 50',variant:'Sunscreen \u00b7 50 g',price:349,mrp:399,rating:4.1,badge:'',bg:'#e8f5e9',color:'#2e7d32',abbr:'AQ'})}
+      ${prodRow({name:'Dot & Key Vitamin C SPF 50',variant:'Sunscreen \u00b7 50 g',price:445,mrp:545,rating:4.0,badge:'New',bg:'#e6f4e6',color:'#1b7a1b',abbr:'D&K'})}
+    </div>`, true);
+    addChips([
+      { label: 'Add Aqualogica \u2014 \u20b9349', style: 'chip-primary', action: 'addRecoToCart()' },
+      { label: 'Back to categories', style: 'chip-secondary', action: 'backToHome()' },
+    ]);
+  }
+}
+
+// ============================================================
+// NEW USER ONBOARDING
+// ============================================================
+async function startNewUser() {
+  clearChips(); isNewUser = true;
+  addUser("I'm new to Tira");
+  showTyping(); await delay(1000); hideTyping();
+
+  const welcomeMsg = 'Welcome! I\'m your AI beauty assistant. Let me set up your beauty profile \u2014 just 3 quick questions!';
+  addAI(welcomeMsg);
+  await delay(600);
+  addAI('What are you most interested in?', true);
+  addChips([
+    { label: 'Skincare', style: 'chip-outline', action: "newUserInterest('Skincare')" },
+    { label: 'Hair Care', style: 'chip-outline', action: "newUserInterest('Hair Care')" },
+    { label: 'Makeup', style: 'chip-outline', action: "newUserInterest('Makeup')" },
+    { label: 'All of the above', style: 'chip-outline', action: "newUserInterest('All Beauty')" },
+  ]);
+}
+
+async function newUserInterest(interest) {
+  clearChips(); addUser(interest);
+  user.interest = interest;
+  await delay(400);
+
+  if (interest === 'Hair Care') {
+    addAI(`Love it \u2014 Hair Care! What\'s your hair type?`, true);
+    addChips([
+      { label: 'Straight', style: 'chip-outline', action: "newUserHairType('Straight')" },
+      { label: 'Wavy', style: 'chip-outline', action: "newUserHairType('Wavy')" },
+      { label: 'Curly', style: 'chip-outline', action: "newUserHairType('Curly')" },
+      { label: 'Coily', style: 'chip-outline', action: "newUserHairType('Coily')" },
+    ]);
+  } else if (interest === 'Makeup') {
+    addAI(`Love it \u2014 Makeup! What\'s your skin undertone?`, true);
+    addChips([
+      { label: 'Warm', style: 'chip-outline', action: "newUserUndertone('Warm')" },
+      { label: 'Cool', style: 'chip-outline', action: "newUserUndertone('Cool')" },
+      { label: 'Neutral', style: 'chip-outline', action: "newUserUndertone('Neutral')" },
+      { label: 'Not sure', style: 'chip-outline', action: "newUserUndertone('Not sure')" },
+    ]);
+  } else {
+    addAI(`Love it \u2014 ${interest}! What\'s your skin type?`, true);
+    addChips([
+      { label: 'Oily', style: 'chip-outline', action: "newUserSkin('Oily')" },
+      { label: 'Dry', style: 'chip-outline', action: "newUserSkin('Dry')" },
+      { label: 'Combination', style: 'chip-outline', action: "newUserSkin('Combination')" },
+      { label: 'Sensitive', style: 'chip-outline', action: "newUserSkin('Sensitive')" },
+    ]);
+  }
+}
+
+async function newUserHairType(type) {
+  clearChips(); addUser(type);
+  user.hairType = type;
+  await delay(400);
+  addAI(`${type} hair, got it! Any top hair concerns?`, true);
+  addChips([
+    { label: 'Frizz', style: 'chip-outline', action: "newUserConcerns('Frizz')" },
+    { label: 'Hair Fall', style: 'chip-outline', action: "newUserConcerns('Hair Fall')" },
+    { label: 'Dandruff', style: 'chip-outline', action: "newUserConcerns('Dandruff')" },
+    { label: 'Dryness', style: 'chip-outline', action: "newUserConcerns('Dryness')" },
+  ]);
+}
+
+async function newUserUndertone(tone) {
+  clearChips(); addUser(tone);
+  user.undertone = tone;
+  await delay(400);
+  addAI(`${tone} undertone! What\'s your makeup priority?`, true);
+  addChips([
+    { label: 'Long-lasting', style: 'chip-outline', action: "newUserConcerns('Long-lasting')" },
+    { label: 'Shade match', style: 'chip-outline', action: "newUserConcerns('Shade match')" },
+    { label: 'Coverage', style: 'chip-outline', action: "newUserConcerns('Coverage')" },
+    { label: 'Natural look', style: 'chip-outline', action: "newUserConcerns('Natural look')" },
+  ]);
+}
+
+async function newUserSkin(type) {
+  clearChips(); addUser(type);
+  user.skinType = type;
+  await delay(400);
+  addAI(`Got it \u2014 ${type} skin! Any top skin concerns?`, true);
+  addChips([
+    { label: 'Acne', style: 'chip-outline', action: "newUserConcerns('Acne')" },
+    { label: 'Pigmentation', style: 'chip-outline', action: "newUserConcerns('Pigmentation')" },
+    { label: 'Anti-aging', style: 'chip-outline', action: "newUserConcerns('Anti-aging')" },
+    { label: 'Sun Protection', style: 'chip-outline', action: "newUserConcerns('Sun Protection')" },
+  ]);
+}
+
+async function newUserConcerns(concern) {
+  clearChips(); addUser(concern);
+  user.concerns = [concern];
+  await delay(400);
+  addAI('And what\'s your usual beauty budget per product?', true);
+  addChips([
+    { label: 'Under \u20b9500', style: 'chip-outline', action: "newUserBudget(500)" },
+    { label: '\u20b9500-1000', style: 'chip-outline', action: "newUserBudget(1000)" },
+    { label: '\u20b91000-2000', style: 'chip-outline', action: "newUserBudget(2000)" },
+    { label: '\u20b92000+', style: 'chip-outline', action: "newUserBudget(3000)" },
+  ]);
+}
+
+async function newUserBudget(budget) {
+  onboarded = true;
+  clearChips(); addUser(budget <= 500 ? 'Under \u20b9500' : budget <= 1000 ? '\u20b9500-1000' : budget <= 2000 ? '\u20b91000-2000' : '\u20b92000+');
+  user.budget = budget;
+  showTyping(); await delay(800); hideTyping();
+  addAI('Your beauty profile is ready!', true);
+  await delay(400);
+
+  let profileStr = '';
+  if (user.interest === 'Hair Care') {
+    profileStr = `<b>Hair:</b> ${user.hairType || 'Set'} | <b>Concern:</b> ${user.concerns.join(', ')} | <b>Budget:</b> ${budget <= 500 ? 'Under \u20b9500' : '\u20b9' + budget}`;
+  } else if (user.interest === 'Makeup') {
+    profileStr = `<b>Undertone:</b> ${user.undertone || 'Set'} | <b>Priority:</b> ${user.concerns.join(', ')} | <b>Budget:</b> ${budget <= 500 ? 'Under \u20b9500' : '\u20b9' + budget}`;
+  } else {
+    profileStr = `<b>Skin:</b> ${user.skinType} | <b>Concern:</b> ${user.concerns.join(', ')} | <b>Budget:</b> ${budget <= 500 ? 'Under \u20b9500' : '\u20b9' + budget}`;
+  }
+  addCard(`<div class="profile-card">
+    <div class="profile-icon">${svg(IC.check,20,20)}</div>
+    <div class="profile-text">${profileStr}</div>
+  </div>`, true);
+
+  await delay(400);
+  addAI('Now I can give you personalised recommendations every time. What would you like to do?', true);
+  await delay(300);
+  showWelcomeCards();
+}
+
+// ============================================================
+// HAIR CARE FLOWS
+// ============================================================
+async function startHairOrder() {
+  addVoiceUser("L'Or\u00e9al shampoo aur Streax hair serum order karo");
+  showTyping(); await delay(1400); hideTyping();
+  const p1 = products.lorealShampoo, p2 = products.streaxSerum;
+  const total = p1.price + p2.price, saved = (p1.mrp-p1.price)+(p2.mrp-p2.price);
+  addAI(`Found your hair essentials on Tira, ${user.name}!`);
+  await delay(600);
+  addCard(`<div class="cart-card">
+    <div class="cart-header"><div class="cart-header-left">${svg(IC.cart)} <span>Your Hair Cart</span></div><span class="cart-count">2 items</span></div>
+    ${prodRow(p1)}${prodRow(p2)}
+    <div class="cart-total"><div class="cart-total-left"><div class="cart-total-label">Total</div><div class="cart-total-sub">2 items \u00b7 Save \u20b9${saved}</div></div><div class="cart-total-price">\u20b9${total}</div></div>
+    <div class="cart-delivery">${svg(IC.cart,14,14)} Tira delivers in 2-3 days to Lodha Palava</div>
+  </div>`, true);
+  await delay(500);
+  addAI("Everything's in your cart. Place the order?", true);
+  addChips([
+    { label: `Place order \u2014 \u20b9${total}`, style: 'chip-primary', action: `confirmOrder(${total},'2 items \u00b7 Hair Care','flow_hair')` },
+    { label: 'Edit cart', style: 'chip-secondary', action: 'editCart()' },
+  ]);
+}
+
+async function startHairRefill() {
+  showTyping(); await delay(1000); hideTyping();
+  addAI(`${user.name}, your hair products need a top-up:`);
+  await delay(1000);
+  addCard(`<div class="notif-card notif-replenish">
+    <div class="notif-accent">${svg(IC.refresh,16,16)} <span class="notif-accent-label">Auto-Replenish</span><span class="notif-accent-time">Just now</span></div>
+    <div class="notif-body">
+      <div class="notif-product">${prodThumb(products.lorealShampoo)}<div class="notif-product-info"><div class="notif-product-name">L'Or\u00e9al Hyaluron Moisture Shampoo</div><div class="notif-product-detail">340 ml \u00b7 \u20b9375</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} You buy every 60 days. Last order was 55 days ago. You'll run out in about a week.</div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.check,16,16)} Yes, reorder</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Later</button></div>
+    </div>
+  </div>`, true);
+  await delay(800);
+  addChips([
+    { label: 'Show hair deals', style: 'chip-sparkle', action: 'showHairDeal()' },
+    { label: "That's enough", style: 'chip-secondary', action: 'skipAlerts()' },
+  ]);
+}
+
+async function showHairDeal() {
+  clearChips(); addUser('Show me hair deals');
+  showTyping(); await delay(800); hideTyping();
+  addAI('Great deal on a hair serum you might love:');
+  await delay(1000);
+  addCard(`<div class="notif-card notif-pricedrop">
+    <div class="notif-accent">${svg(IC.star,16,16)} <span class="notif-accent-label">Price Drop</span><span class="notif-accent-time">3 min ago</span></div>
+    <div class="notif-body">
+      <div class="notif-product">${prodThumb(products.streaxSerum)}<div class="notif-product-info"><div class="notif-product-name">Streax Professional Hair Serum</div><div class="notif-product-detail">Hair Serum \u00b7 100 ml</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} Tira Weekend Sale! 25% off \u2014 great for taming frizz in humidity season.</div>
+      <div class="notif-price"><span class="notif-price-now">\u20b9221</span><span class="notif-price-was">\u20b9295</span><span class="notif-price-save">Save \u20b974</span></div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.cart,16,16)} Order now \u2014 \u20b9221</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Skip</button></div>
+    </div>
+  </div>`, true);
+  await delay(600);
+  addAI("That's all for hair care alerts. I'll keep tracking your routine!", true);
+  addChips([
+    { label: 'Back to categories', style: 'chip-secondary', action: 'backToHome()' },
+  ]);
+}
+
+async function startHairAdvisor() {
+  addUser('Mere baal bohot dry hain, kuch suggest karo');
+  showTyping(); await delay(1200); hideTyping();
+  addAI('Dry hair? I can help! Let me find the best products for you. A few quick details:');
+  await delay(600);
+  addCard(`<div class="quiz-card" id="quizCard">
+    <div class="quiz-title">Your Hair Concerns <span style="font-size:12px;font-weight:500;color:var(--text-low)">(select all that apply)</span></div>
+    <div class="quiz-chips" id="concernChips">
+      <button class="quiz-chip selected" onclick="toggleQuizChip(this)">Dryness</button>
+      <button class="quiz-chip selected" onclick="toggleQuizChip(this)">Frizz</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Hair Fall</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Dandruff</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Damage</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Split Ends</button>
+    </div>
+    <div class="quiz-label">Budget per product</div>
+    <div class="quiz-slider-wrap">
+      <input type="range" class="quiz-slider" min="200" max="2000" step="100" value="500" oninput="updateBudget(this.value)">
+      <div class="quiz-budget-labels"><span>\u20b9200</span><span>\u20b92,000</span></div>
+      <div class="quiz-budget-val" id="budgetVal">\u20b9500</div>
+    </div>
+    <button class="quiz-submit" onclick="submitHairQuiz()">Find my perfect match</button>
+  </div>`, true);
+}
+
+async function submitHairQuiz() {
+  const selected = [...document.querySelectorAll('#concernChips .quiz-chip.selected')].map(c => c.textContent);
+  clearChips();
+  addUser(`Concerns: ${selected.join(', ')}`);
+  showTyping(); await delay(1800); hideTyping();
+  addAI(`For dry, frizzy hair, here are my top 3 picks:`);
+  await delay(600);
+  addCard(`<div class="compare-card">
+    <div class="compare-title">${svg(IC.star)} Shampoo Showdown</div>
+    <div class="compare-item">
+      <div class="compare-item-head"><div class="compare-item-rank best">1</div><div class="compare-item-name">L'Or\u00e9al Hyaluron Moisture</div><span class="compare-item-best-tag">Best Match</span><div class="compare-item-price">\u20b9375</div></div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Ingredient</div><div class="compare-detail-val">Hyaluronic Acid + Moisture Lock</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Deep hydration, controls frizz 72hrs</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.4</span></div></div>
+      </div>
+    </div>
+    <div class="compare-item">
+      <div class="compare-item-head"><div class="compare-item-rank alt">2</div><div class="compare-item-name">TRESemm\u00e9 Keratin Smooth</div><div class="compare-item-price">\u20b9485</div></div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Ingredient</div><div class="compare-detail-val">Keratin + Argan Oil</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Smooths cuticles, salon-like finish</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.3</span></div></div>
+      </div>
+    </div>
+    <div class="compare-item">
+      <div class="compare-item-head"><div class="compare-item-rank alt">3</div><div class="compare-item-name">Dove Hair Fall Rescue</div><div class="compare-item-price">\u20b9199</div></div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Ingredient</div><div class="compare-detail-val">Nutrilock Actives + Moisture</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Budget-friendly, gentle daily use</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.3</span></div></div>
+      </div>
+    </div>
+  </div>`, true);
+  await delay(600);
+  addCard(`<div class="ingredient-card">
+    <div class="ingredient-title">Why L'Or\u00e9al Hyaluron is your #1 match</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Hyaluronic Acid</b> \u2192 Draws moisture deep into each strand</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>72-hour frizz control</b> \u2192 Perfect for Indian humidity</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Sulfate-free formula</b> \u2192 Won't strip natural oils from dry hair</div>
+  </div>`, true);
+  await delay(500);
+  const msg = "L'Or\u00e9al Hyaluron is my top pick \u2014 Hyaluronic Acid gives deep hydration without weighing hair down.";
+  addAI(msg, true);
+  addChips([
+    { label: "Add L'Or\u00e9al to cart \u2014 \u20b9375", style: 'chip-primary', action: 'addRecoToCart()' },
+    { label: 'Show more options', style: 'chip-secondary', action: 'showMoreOptions()' },
+  ]);
+}
+
+// ============================================================
+// MAKEUP & FRAGRANCE FLOWS
+// ============================================================
+async function startMakeupOrder() {
+  addVoiceUser('MAC Ruby Woo lipstick aur Lakm\u00e9 foundation order karo');
+  showTyping(); await delay(1400); hideTyping();
+  const p1 = products.macLipstick, p2 = products.lakmeFdn;
+  const total = p1.price + p2.price, saved = (p1.mrp-p1.price)+(p2.mrp-p2.price);
+  addAI(`Found your makeup must-haves on Tira, ${user.name}!`);
+  await delay(600);
+  addCard(`<div class="cart-card">
+    <div class="cart-header"><div class="cart-header-left">${svg(IC.cart)} <span>Your Makeup Cart</span></div><span class="cart-count">2 items</span></div>
+    ${prodRow(p1)}${prodRow(p2)}
+    <div class="cart-total"><div class="cart-total-left"><div class="cart-total-label">Total</div><div class="cart-total-sub">2 items${saved > 0 ? ' \u00b7 Save \u20b9'+saved : ''}</div></div><div class="cart-total-price">\u20b9${total}</div></div>
+    <div class="cart-delivery">${svg(IC.cart,14,14)} Tira delivers in 2-3 days to Lodha Palava</div>
+  </div>`, true);
+  await delay(500);
+  addAI("Your makeup haul is ready. Place the order?", true);
+  addChips([
+    { label: `Place order \u2014 \u20b9${total}`, style: 'chip-primary', action: `confirmOrder(${total},'2 items \u00b7 Makeup','flow_makeup')` },
+    { label: 'Edit cart', style: 'chip-secondary', action: 'editCart()' },
+  ]);
+}
+
+async function startMakeupRefill() {
+  showTyping(); await delay(1000); hideTyping();
+  addAI(`${user.name}, your makeup bag needs restocking:`);
+  await delay(1000);
+  addCard(`<div class="notif-card notif-replenish">
+    <div class="notif-accent">${svg(IC.refresh,16,16)} <span class="notif-accent-label">Auto-Replenish</span><span class="notif-accent-time">Just now</span></div>
+    <div class="notif-body">
+      <div class="notif-product">${prodThumb(products.lakmeFdn)}<div class="notif-product-info"><div class="notif-product-name">Lakm\u00e9 9to5 Primer+Matte Foundation</div><div class="notif-product-detail">25 ml \u00b7 \u20b9599</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} You buy every 90 days. Last order was 85 days ago. Running low on your daily foundation!</div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.check,16,16)} Yes, reorder</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Later</button></div>
+    </div>
+  </div>`, true);
+  await delay(800);
+  addChips([
+    { label: 'Show makeup deals', style: 'chip-sparkle', action: 'showMakeupDeal()' },
+    { label: "That's enough", style: 'chip-secondary', action: 'skipAlerts()' },
+  ]);
+}
+
+async function showMakeupDeal() {
+  clearChips(); addUser('Show me makeup deals');
+  showTyping(); await delay(800); hideTyping();
+  addAI('A deal for your iconic lipstick:');
+  await delay(1000);
+  addCard(`<div class="notif-card notif-pricedrop">
+    <div class="notif-accent">${svg(IC.star,16,16)} <span class="notif-accent-label">Price Drop</span><span class="notif-accent-time">1 min ago</span></div>
+    <div class="notif-body">
+      <div class="notif-product">${prodThumb(products.macLipstick)}<div class="notif-product-info"><div class="notif-product-name">MAC Matte Lipstick \u2014 Ruby Woo</div><div class="notif-product-detail">Lipstick \u00b7 3 g</div></div></div>
+      <div class="notif-context">${svg(IC.info,16,16)} Tira Luxe Week! 15% off on all MAC products \u2014 rare discount on this iconic shade.</div>
+      <div class="notif-price"><span class="notif-price-now">\u20b91,488</span><span class="notif-price-was">\u20b91,750</span><span class="notif-price-save">Save \u20b9262</span></div>
+      <div class="notif-actions"><button class="notif-btn-primary" onclick="confirmNotif(this)">${svg(IC.cart,16,16)} Grab it \u2014 \u20b91,488</button><button class="notif-btn-dismiss" onclick="dismissNotif(this)">Skip</button></div>
+    </div>
+  </div>`, true);
+  await delay(600);
+  addAI("That's all for makeup alerts. I'll notify you for the next big sale!", true);
+  addChips([
+    { label: 'Back to categories', style: 'chip-secondary', action: 'backToHome()' },
+  ]);
+}
+
+async function startMakeupAdvisor() {
+  addUser('Mujhe long-lasting foundation chahiye, medium coverage');
+  showTyping(); await delay(1200); hideTyping();
+  addAI('Foundation shopping! Let me find your perfect shade match. A couple more details:');
+  await delay(600);
+  addCard(`<div class="quiz-card" id="quizCard">
+    <div class="quiz-title">Your Makeup Needs <span style="font-size:12px;font-weight:500;color:var(--text-low)">(select all that apply)</span></div>
+    <div class="quiz-chips" id="concernChips">
+      <button class="quiz-chip selected" onclick="toggleQuizChip(this)">Long-lasting</button>
+      <button class="quiz-chip selected" onclick="toggleQuizChip(this)">Medium Coverage</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Full Coverage</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Dewy Finish</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">Matte Finish</button>
+      <button class="quiz-chip" onclick="toggleQuizChip(this)">SPF Protection</button>
+    </div>
+    <div class="quiz-label">Budget per product</div>
+    <div class="quiz-slider-wrap">
+      <input type="range" class="quiz-slider" min="200" max="2000" step="100" value="600" oninput="updateBudget(this.value)">
+      <div class="quiz-budget-labels"><span>\u20b9200</span><span>\u20b92,000</span></div>
+      <div class="quiz-budget-val" id="budgetVal">\u20b9600</div>
+    </div>
+    <button class="quiz-submit" onclick="submitMakeupQuiz()">Find my perfect match</button>
+  </div>`, true);
+}
+
+async function submitMakeupQuiz() {
+  const selected = [...document.querySelectorAll('#concernChips .quiz-chip.selected')].map(c => c.textContent);
+  clearChips();
+  addUser(`Needs: ${selected.join(', ')}`);
+  showTyping(); await delay(1800); hideTyping();
+  addAI('For long-lasting medium coverage, here are my top 3 foundation picks:');
+  await delay(600);
+  addCard(`<div class="compare-card">
+    <div class="compare-title">${svg(IC.star)} Foundation Showdown</div>
+    <div class="compare-item">
+      <div class="compare-item-head"><div class="compare-item-rank best">1</div><div class="compare-item-name">Lakm\u00e9 9to5 Primer+Matte</div><span class="compare-item-best-tag">Best Match</span><div class="compare-item-price">\u20b9599</div></div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Feature</div><div class="compare-detail-val">Built-in primer, 12hr stay</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Medium-buildable, matte finish</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.3</span></div></div>
+      </div>
+    </div>
+    <div class="compare-item">
+      <div class="compare-item-head"><div class="compare-item-rank alt">2</div><div class="compare-item-name">Maybelline Fit Me Foundation</div><div class="compare-item-price">\u20b9450</div></div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Feature</div><div class="compare-detail-val">40 shades, poreless formula</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Natural finish, all-day wear</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.4</span></div></div>
+      </div>
+    </div>
+    <div class="compare-item">
+      <div class="compare-item-head"><div class="compare-item-rank alt">3</div><div class="compare-item-name">Maybelline Fit Me Concealer</div><div class="compare-item-price">\u20b9499</div></div>
+      <div class="compare-details">
+        <div class="compare-detail"><div class="compare-detail-label">Key Feature</div><div class="compare-detail-val">Oil-free, lightweight</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Why It Works</div><div class="compare-detail-val">Spot conceal + under-eye, pairs with any foundation</div></div>
+        <div class="compare-detail"><div class="compare-detail-label">Rating</div><div class="compare-detail-rating">${svg(IC.star,12,12)} <span>4.5</span></div></div>
+      </div>
+    </div>
+  </div>`, true);
+  await delay(600);
+  addCard(`<div class="ingredient-card">
+    <div class="ingredient-title">Why Lakm\u00e9 9to5 is your #1 match</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Built-in primer</b> \u2192 No separate primer needed, saves time</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>12-hour stay</b> \u2192 Lasts through your workday without touch-ups</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Medium-buildable coverage</b> \u2192 Exactly what you asked for</div>
+    <div class="ingredient-item"><span class="ingredient-bullet">\u2022</span> <b>Indian skin shade range</b> \u2192 Designed for Indian undertones</div>
+  </div>`, true);
+  await delay(500);
+  const msg = "Lakm\u00e9 9to5 is my top pick \u2014 built-in primer plus 12-hour wear means one less step in your routine.";
+  addAI(msg, true);
+  addChips([
+    { label: 'Add Lakm\u00e9 to cart \u2014 \u20b9599', style: 'chip-primary', action: 'addRecoToCart()' },
+    { label: 'Show more options', style: 'chip-secondary', action: 'showMoreOptions()' },
+  ]);
+}
+
+// === HELPERS ===
+function backToHome() {
+  clearChips(); addUser('Back to home'); showTyping();
+  setTimeout(() => { hideTyping();
+    addAI(`What else can I help with, ${user.name}?`);
+    showWelcomeCards();
+  }, 600);
+}
+
+// === INIT ===
+function resetDemo() { CC.innerHTML = ''; onboarded = false; activeCat = 'skin'; startConversation(); }
+
+async function startConversation() {
+  await delay(400);
+  const greeting = `Hi ${user.name}! Your AI beauty assistant is here. What would you like to do today?`;
+  addAI(greeting);
+  await delay(300);
+  showWelcomeCards();
+}
+
+startConversation();
+</script>
+</body>
+</html>

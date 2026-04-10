@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AI Fashion Assistant — AJIO × JioBharatIQ</title>
+<style>
+@font-face{font-family:'JioType';font-weight:400;src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2')}
+@font-face{font-family:'JioType';font-weight:500;src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2')}
+@font-face{font-family:'JioType';font-weight:700;src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2')}
+@font-face{font-family:'JioType';font-weight:900;src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary-20:#e8e8fc;--primary-30:#9999ff;--primary-40:#6464ff;
+  --primary-50:#3535f3;--primary-60:#000093;--primary-70:#00004c;
+  --secondary-20:#fef7e9;--secondary-30:#ffe3ae;--secondary-50:#f7ab20;--secondary-60:#ac660c;--secondary-70:#7f4b10;
+  --sparkle-20:#e8faf7;--sparkle-30:#a7f6e9;--sparkle-50:#1eccb0;--sparkle-60:#1e7b74;--sparkle-70:#0e5c4f;
+  --error:#fa2f40;--warning:#f06d0f;--success:#25ab21;
+  --grey-100:#141414;--grey-80:rgba(0,0,0,0.66);--grey-60:#b5b5b5;--grey-40:#e0e0e0;--grey-20:#f5f5f5;--white:#ffffff;
+  --surface-ghost:#eeeeef;--surface-ghost-icon:#e7e9ff;--surface-bold:#3900ad;--surface-minimal:#f5f5f5;--surface-moderate:#e3e3e4;
+  --text-high:#141414;--text-low:rgba(25,27,30,0.65);--text-disabled:rgba(25,27,30,0.38);--text-on-bold:#ffffff;
+  --icon-medium:#170054;--icon-high:#141414;
+  --stroke-subtle:rgba(36,38,43,0.12);--stroke-minimal:rgba(36,38,43,0.13);
+  --shape-sm:8px;--shape-md:12px;--shape-lg:16px;--shape-pill:999px;
+  --spacing-xs:8px;--spacing-s:12px;--spacing-m:16px;--spacing-l:20px;--spacing-xl:24px;
+}
+body{font-family:'JioType',sans-serif;background:var(--grey-20);-webkit-font-smoothing:antialiased;overflow:hidden}
+.phone-frame{width:100%;max-width:390px;height:100dvh;margin:0 auto;display:flex;flex-direction:column;background:var(--white);position:relative;overflow:hidden}
+@media(min-width:768px){body{display:flex;align-items:center;justify-content:center}.phone-frame{height:844px;border-radius:32px;box-shadow:0 25px 60px rgba(0,0,0,0.15)}}
+
+/* Status Bar */
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 4px;flex-shrink:0;background:var(--white)}
+.status-time{font-size:15px;font-weight:700;color:var(--text-high)}
+.status-icons{display:flex;align-items:center;gap:6px}
+.status-icons svg{width:16px;height:16px;color:var(--text-high)}
+
+/* Header */
+.header-nav{display:flex;align-items:center;padding:8px 16px 12px;gap:12px;flex-shrink:0;background:var(--white);border-bottom:1px solid var(--stroke-subtle)}
+.back-btn{width:32px;height:32px;border-radius:var(--shape-pill);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-high)}
+.back-btn:active{background:var(--surface-ghost)}
+.back-btn svg{width:20px;height:20px}
+.hn-center{flex:1;padding:0 8px}
+.hn-title{font-size:16px;font-weight:700;color:var(--text-high);letter-spacing:-0.03em}
+.hn-sub{font-size:13px;font-weight:500;color:var(--text-low)}
+
+/* Chat Container */
+.chat-container{flex:1;overflow-y:auto;padding:var(--spacing-m);display:flex;flex-direction:column;gap:var(--spacing-s);scroll-behavior:smooth}
+.chat-container::-webkit-scrollbar{display:none}
+
+/* Messages */
+.msg-row{display:flex;gap:var(--spacing-xs);max-width:100%}
+.msg-row.ai{align-items:flex-start}
+.msg-row.user{justify-content:flex-end}
+.msg-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background:var(--primary-20)}
+.msg-avatar video{width:100%;height:100%;object-fit:cover}
+.msg-avatar svg{width:16px;height:16px;color:var(--primary-50)}
+.msg-content{display:flex;flex-direction:column;gap:6px;max-width:85%}
+.msg-bubble{padding:10px 14px;border-radius:var(--shape-lg);font-size:15px;font-weight:500;line-height:1.5;max-width:100%}
+.msg-row.ai .msg-bubble{background:var(--surface-ghost);color:var(--text-high);border-bottom-left-radius:4px}
+.msg-row.user .msg-bubble{background:var(--primary-50);color:var(--white);border-bottom-right-radius:4px}
+
+/* Typing */
+.typing-row{display:flex;gap:var(--spacing-xs);align-items:flex-start}
+.typing-dots{display:flex;gap:4px;padding:12px 14px;background:var(--surface-ghost);border-radius:var(--shape-lg);border-bottom-left-radius:4px}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--grey-60);animation:bounce 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
+
+/* Chips */
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0;padding-left:36px}
+.chip{padding:6px 12px;border-radius:var(--shape-pill);font-size:12px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;border:none;transition:transform 0.15s;white-space:nowrap}
+.chip:active{transform:scale(0.96)}
+.chip-primary{background:var(--primary-50);color:var(--white)}
+.chip-secondary{background:var(--surface-ghost);color:var(--text-high)}
+.chip-sparkle{background:var(--sparkle-20);color:var(--sparkle-70)}
+.chip-outline{background:var(--white);color:var(--text-high);border:1.5px solid var(--stroke-subtle)}
+.chip-outline:hover{border-color:var(--primary-30);background:var(--primary-20)}
+
+/* Animations */
+.card-wrap{animation:cardUp 0.4s ease-out;width:100%}
+@keyframes cardUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Category Cards */
+.cat-cards{display:flex;flex-direction:column;gap:var(--spacing-xs);width:100%}
+.cat-card{display:flex;align-items:center;gap:var(--spacing-s);padding:14px;background:var(--white);border:1.5px solid var(--stroke-subtle);border-radius:var(--shape-lg);cursor:pointer;transition:all 0.15s}
+.cat-card:active{transform:scale(0.98);border-color:var(--primary-50)}
+.cat-card-icon{width:44px;height:44px;border-radius:var(--shape-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cat-card-icon svg{width:22px;height:22px}
+.cat-card-text{flex:1}
+.cat-card-title{font-size:15px;font-weight:700;color:var(--text-high)}
+.cat-card-sub{font-size:13px;font-weight:500;color:var(--text-low);margin-top:2px}
+.cat-card-arrow svg{width:18px;height:18px;color:var(--grey-60)}
+
+/* Product Cards */
+.product-grid{display:flex;gap:10px;overflow-x:auto;padding:4px 0;width:100%;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.product-grid::-webkit-scrollbar{display:none}
+.product-card{min-width:160px;max-width:160px;border-radius:var(--shape-lg);overflow:hidden;border:1px solid var(--stroke-subtle);background:var(--white);flex-shrink:0;scroll-snap-align:start;cursor:pointer;transition:transform 0.15s;display:flex;flex-direction:column}
+.product-card:active{transform:scale(0.97)}
+.product-card-img{width:100%;height:180px;object-fit:cover;background:var(--grey-20);display:block}
+.product-card-body{padding:10px;display:flex;flex-direction:column;flex:1}
+.product-card-brand{font-size:10px;font-weight:700;color:var(--text-low);text-transform:uppercase;letter-spacing:0.5px}
+.product-card-name{font-size:13px;font-weight:700;color:var(--text-high);margin-top:2px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.product-card-meta{display:flex;align-items:center;gap:6px;margin-top:4px}
+.product-card-price{font-size:14px;font-weight:900;color:var(--text-high)}
+.product-card-mrp{font-size:11px;font-weight:500;color:var(--text-disabled);text-decoration:line-through}
+.product-card-discount{font-size:10px;font-weight:700;color:var(--warning)}
+.product-card-rating{display:flex;align-items:center;gap:2px;margin-top:4px;font-size:11px;font-weight:700;color:var(--secondary-60)}
+.product-card-rating svg{width:11px;height:11px;color:var(--secondary-50)}
+.product-card-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.3px;background:var(--sparkle-20);color:var(--sparkle-70);margin-top:4px}
+.product-card-cta{width:100%;padding:8px;border-radius:var(--shape-sm);border:1.5px solid var(--primary-50);background:var(--white);color:var(--primary-50);font-size:12px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;margin-top:auto;padding-top:8px;transition:all 0.15s}
+.product-card-cta:active{background:var(--primary-50);color:var(--white)}
+
+/* Lookbook Card */
+.lookbook-card{background:var(--white);border:1px solid var(--stroke-subtle);border-radius:var(--shape-lg);overflow:hidden;width:100%}
+.lookbook-header{padding:14px;display:flex;align-items:center;gap:10px;background:var(--grey-20);border-bottom:1px solid var(--stroke-subtle)}
+.lookbook-header-icon{width:36px;height:36px;border-radius:var(--shape-sm);background:var(--primary-20);display:flex;align-items:center;justify-content:center}
+.lookbook-header-icon svg{width:18px;height:18px;color:var(--primary-50)}
+.lookbook-header-text{flex:1}
+.lookbook-header-title{font-size:14px;font-weight:700;color:var(--text-high)}
+.lookbook-header-sub{font-size:11px;font-weight:500;color:var(--text-low);margin-top:1px}
+.lookbook-hero{width:100%;height:220px;background:var(--grey-20);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.lookbook-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:100%;height:100%}
+.lookbook-hero-grid img{width:100%;height:100%;object-fit:cover}
+.lookbook-tag{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.7);color:var(--white);font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--shape-pill)}
+.lookbook-items{padding:0}
+.lookbook-item{display:flex;align-items:center;padding:10px 14px;gap:10px;border-bottom:1px solid var(--stroke-subtle)}
+.lookbook-item:last-child{border-bottom:none}
+.lookbook-item-thumb{width:44px;height:44px;border-radius:var(--shape-sm);background:var(--grey-20);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;letter-spacing:-0.5px}
+.lookbook-item-thumb img{width:100%;height:100%;object-fit:cover}
+.lookbook-item-info{flex:1;min-width:0}
+.lookbook-item-name{font-size:13px;font-weight:700;color:var(--text-high);line-height:1.3}
+.lookbook-item-brand{font-size:11px;font-weight:500;color:var(--text-low);margin-top:1px}
+.lookbook-item-price{text-align:right;flex-shrink:0}
+.lookbook-item-price-val{font-size:14px;font-weight:700;color:var(--text-high)}
+.lookbook-item-price-mrp{font-size:11px;font-weight:500;color:var(--text-disabled);text-decoration:line-through}
+.lookbook-total{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;background:var(--grey-20);border-top:1px solid var(--stroke-subtle)}
+.lookbook-total-label{font-size:13px;font-weight:700;color:var(--text-high)}
+.lookbook-total-val{font-size:18px;font-weight:900;color:var(--primary-50)}
+.lookbook-total-save{font-size:11px;font-weight:700;color:var(--success);margin-top:2px}
+.lookbook-cta{display:flex;gap:8px;padding:0 14px 14px}
+.lookbook-cta-btn{flex:1;padding:10px;border-radius:var(--shape-pill);font-size:13px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;text-align:center;transition:transform 0.15s}
+.lookbook-cta-btn:active{transform:scale(0.96)}
+.lookbook-cta-primary{background:var(--primary-50);color:var(--white);border:none}
+.lookbook-cta-secondary{background:var(--white);color:var(--primary-50);border:1.5px solid var(--primary-50)}
+
+/* Try-On Card */
+.tryon-card{background:var(--white);border:1px solid var(--stroke-subtle);border-radius:var(--shape-lg);overflow:hidden;width:100%}
+.tryon-header{padding:14px;display:flex;align-items:center;gap:10px;background:var(--sparkle-20);border-bottom:1px solid var(--stroke-subtle)}
+.tryon-header-icon{width:36px;height:36px;border-radius:var(--shape-sm);background:var(--sparkle-50);display:flex;align-items:center;justify-content:center}
+.tryon-header-icon svg{width:18px;height:18px;color:var(--white)}
+.tryon-header-title{font-size:14px;font-weight:700;color:var(--sparkle-70)}
+/* tryon-result removed — now using inline full-body single image */
+.tryon-fit{padding:12px 14px;background:var(--secondary-20);display:flex;align-items:flex-start;gap:8px}
+.tryon-fit-icon{flex-shrink:0;margin-top:1px}
+.tryon-fit-icon svg{width:16px;height:16px;color:var(--secondary-60)}
+.tryon-fit-text{font-size:13px;font-weight:500;color:var(--secondary-70);line-height:1.4}
+.tryon-fit-text b{font-weight:700}
+.tryon-product{padding:12px 14px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--stroke-subtle)}
+.tryon-product-info{flex:1}
+.tryon-product-name{font-size:14px;font-weight:700;color:var(--text-high)}
+.tryon-product-brand{font-size:12px;font-weight:500;color:var(--text-low);margin-top:1px}
+.tryon-product-price{font-size:16px;font-weight:900;color:var(--primary-50)}
+.tryon-cta{display:flex;gap:8px;padding:0 14px 14px}
+
+/* Voice Listening Overlay */
+.voice-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--white);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;animation:fadeIn 0.3s ease-out}
+.voice-overlay video{width:120px;height:120px;border-radius:50%;object-fit:cover}
+.voice-overlay-text{font-size:18px;font-weight:700;color:var(--text-high);text-align:center;padding:0 40px}
+.voice-overlay-sub{font-size:14px;font-weight:500;color:var(--text-low)}
+.voice-transcript{font-size:16px;font-weight:700;color:var(--primary-50);animation:fadeIn 0.4s ease-out;text-align:center;padding:0 40px}
+.voice-cancel{padding:10px 24px;border-radius:var(--shape-pill);border:1.5px solid var(--stroke-subtle);background:var(--white);font-size:14px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;color:var(--text-high);margin-top:20px}
+
+/* Generating Progress */
+.gen-card{background:var(--white);border:1px solid var(--stroke-subtle);border-radius:var(--shape-lg);padding:20px;width:100%;text-align:center}
+.gen-progress{width:100%;height:4px;background:var(--grey-40);border-radius:2px;overflow:hidden;margin-top:12px}
+.gen-progress-bar{height:100%;background:var(--sparkle-50);border-radius:2px;animation:genProgress 3s ease-out forwards}
+@keyframes genProgress{from{width:0%}to{width:100%}}
+.gen-label{font-size:13px;font-weight:700;color:var(--text-low);margin-top:8px}
+.gen-icon{margin-bottom:8px}
+.gen-icon svg{width:32px;height:32px;color:var(--sparkle-50);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.1)}}
+
+/* Profile Card */
+.profile-card{background:var(--sparkle-20);border-radius:var(--shape-lg);padding:14px;width:100%;display:flex;align-items:center;gap:12px}
+.profile-icon{width:40px;height:40px;border-radius:50%;background:var(--sparkle-50);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.profile-icon svg{width:20px;height:20px;color:var(--white)}
+.profile-text{flex:1;font-size:13px;font-weight:500;line-height:1.4;color:var(--sparkle-70)}
+.profile-text b{font-weight:700}
+
+/* Quiz Chips */
+.quiz-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:var(--spacing-m)}
+.quiz-chip{padding:8px 14px;border-radius:var(--shape-pill);font-size:13px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;border:1.5px solid var(--stroke-subtle);background:var(--white);color:var(--text-high);transition:all 0.15s}
+.quiz-chip.selected{background:var(--primary-20);border-color:var(--primary-50);color:var(--primary-50)}
+.quiz-chip:active{transform:scale(0.96)}
+
+/* Skeleton Shimmer */
+.skeleton{background:var(--grey-20);border-radius:var(--shape-sm);position:relative;overflow:hidden}
+.skeleton::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),transparent);animation:shimmer 1.5s infinite}
+@keyframes shimmer{to{left:100%}}
+
+/* Voice Bubble (user voice message) */
+.voice-bubble{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--shape-lg);border-bottom-right-radius:4px;background:var(--primary-50);color:var(--white)}
+.voice-wave{display:flex;align-items:center;gap:2px;height:20px}
+.voice-wave span{width:3px;border-radius:2px;background:var(--white);animation:wave 0.8s ease-in-out infinite}
+.voice-wave span:nth-child(1){height:8px;animation-delay:0s}
+.voice-wave span:nth-child(2){height:14px;animation-delay:0.1s}
+.voice-wave span:nth-child(3){height:20px;animation-delay:0.2s}
+.voice-wave span:nth-child(4){height:12px;animation-delay:0.3s}
+.voice-wave span:nth-child(5){height:6px;animation-delay:0.4s}
+@keyframes wave{0%,100%{transform:scaleY(0.5)}50%{transform:scaleY(1)}}
+.voice-label{font-size:14px;font-weight:700}
+
+/* Product Row (cart-style) */
+.prod-row{display:flex;align-items:center;padding:10px 14px;gap:10px;border-bottom:1px solid var(--stroke-subtle)}
+.prod-row:last-of-type{border-bottom:none}
+.prod-thumb{width:48px;height:48px;border-radius:var(--shape-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--white);letter-spacing:-0.5px;overflow:hidden}
+.prod-thumb img{width:100%;height:100%;object-fit:cover}
+.prod-info{flex:1;min-width:0}
+.prod-name{font-size:13px;font-weight:700;color:var(--text-high);line-height:1.3}
+.prod-variant{font-size:11px;font-weight:500;color:var(--text-low);margin-top:1px}
+.prod-meta{display:flex;align-items:center;gap:6px;margin-top:3px}
+.prod-rating{display:flex;align-items:center;gap:2px;font-size:11px;font-weight:700;color:var(--secondary-60)}
+.prod-rating svg{width:12px;height:12px;color:var(--secondary-50)}
+.prod-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.3px;background:var(--sparkle-20);color:var(--sparkle-70)}
+.prod-price-col{text-align:right;flex-shrink:0}
+.prod-price{font-size:14px;font-weight:700;color:var(--text-high)}
+.prod-mrp{font-size:11px;font-weight:500;color:var(--text-disabled);text-decoration:line-through}
+
+/* Cart Card */
+.cart-card{background:var(--white);border:1px solid var(--stroke-subtle);border-radius:var(--shape-lg);overflow:hidden;width:100%}
+.cart-header{padding:var(--spacing-s) 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--stroke-subtle);background:var(--grey-20)}
+.cart-header-left{display:flex;align-items:center;gap:var(--spacing-xs)}
+.cart-header-left svg{width:18px;height:18px;color:var(--primary-50)}
+.cart-header-left span{font-size:14px;font-weight:700}
+.cart-count{font-size:12px;font-weight:700;color:var(--primary-50);background:var(--primary-20);padding:2px 8px;border-radius:var(--shape-pill)}
+.cart-total{padding:var(--spacing-s) 14px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--stroke-subtle);background:var(--grey-20)}
+.cart-total-label{font-size:14px;font-weight:700}
+.cart-total-sub{font-size:11px;font-weight:500;color:var(--text-low)}
+.cart-total-price{font-size:18px;font-weight:900;color:var(--primary-50);letter-spacing:-0.03em}
+
+/* Ingredient/Why Card */
+.why-card{background:var(--primary-20);border-radius:var(--shape-lg);padding:14px;width:100%}
+.why-title{font-size:13px;font-weight:700;color:var(--primary-60);margin-bottom:8px}
+.why-item{display:flex;gap:8px;margin-bottom:6px;font-size:13px;font-weight:500;line-height:1.4;color:var(--text-high)}
+.why-bullet{color:var(--primary-50);flex-shrink:0;font-weight:700}
+
+/* Bottom Widget (JDS ChatInput) */
+.bottom-widget{padding:8px var(--spacing-s) 12px;background:var(--white);flex-shrink:0}
+.bw-container{background:var(--surface-ghost);border-radius:24px;padding:4px;display:flex;flex-direction:column}
+.bw-input{padding:10px 12px 4px}
+.bw-real-input{width:100%;border:none;outline:none;font-family:'JioType',sans-serif;font-size:14px;color:var(--text-high);background:transparent}
+.bw-real-input::placeholder{color:var(--text-low)}
+.bw-actions{display:flex;justify-content:space-between;align-items:center;height:40px;padding:0 4px}
+.bw-left{display:flex;gap:2px}
+.wib{width:36px;height:36px;border-radius:var(--shape-pill);display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;color:var(--grey-80)}
+.wib:active{background:var(--surface-moderate)}
+.wib svg{width:20px;height:20px}
+.bw-send{width:36px;height:36px;border-radius:50%;border:none;background:var(--primary-50);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.bw-send svg{width:18px;height:18px;fill:var(--white)}
+.bw-send.hidden-send{display:none}
+.speak-btn{background:var(--primary-50);border:none;border-radius:var(--shape-pill);padding:10px 18px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.speak-btn svg{width:16px;height:16px;fill:var(--white)}
+.speak-btn span{font-family:'JioType',sans-serif;font-weight:700;font-size:14px;color:var(--white)}
+
+/* Payment Card */
+.payment-card{background:var(--white);border:1px solid var(--stroke-subtle);border-radius:var(--shape-lg);overflow:hidden;width:100%}
+.pay-header{display:flex;align-items:center;gap:10px;padding:14px;border-bottom:1px solid var(--stroke-subtle);background:var(--grey-20)}
+.pay-header svg{width:20px;height:20px;color:var(--primary-50)}
+.pay-header-text{flex:1}
+.pay-header-title{font-size:14px;font-weight:700}
+.pay-header-sub{font-size:11px;font-weight:500;color:var(--text-low)}
+.pay-amount{display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--stroke-subtle)}
+.pay-amount-label{font-size:13px;font-weight:500;color:var(--text-low)}
+.pay-amount-val{font-size:18px;font-weight:900;color:var(--primary-50)}
+.pay-methods{padding:8px 14px}
+.pay-method{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer;border-bottom:1px solid var(--stroke-subtle)}
+.pay-method:last-child{border-bottom:none}
+.pay-method-icon{width:40px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
+.pay-method-info{flex:1}
+.pay-method-name{font-size:13px;font-weight:700;color:var(--text-high)}
+.pay-method-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px}
+.pay-method-detail{font-size:11px;font-weight:500;color:var(--text-low);margin-top:1px}
+.pay-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--grey-40);flex-shrink:0;position:relative}
+.pay-method.selected .pay-radio{border-color:var(--primary-50)}
+.pay-method.selected .pay-radio::after{content:'';position:absolute;top:3px;left:3px;width:8px;height:8px;border-radius:50%;background:var(--primary-50)}
+.pay-footer{padding:14px}
+.pay-btn{width:100%;padding:12px;border-radius:var(--shape-pill);border:none;background:var(--primary-50);color:var(--white);font-size:15px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer}
+.pay-btn:active{opacity:0.85}
+.pay-secured{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:8px;font-size:11px;font-weight:500;color:var(--text-low)}
+.pay-secured svg{width:12px;height:12px;color:var(--success)}
+
+/* Order Success */
+.success-card{background:var(--sparkle-20);border-radius:var(--shape-lg);padding:20px;width:100%;text-align:center}
+.success-card svg{width:40px;height:40px;color:var(--success);margin-bottom:8px}
+.success-card-title{font-size:16px;font-weight:900;color:var(--sparkle-70)}
+.success-card-sub{font-size:13px;font-weight:500;color:var(--sparkle-60);margin-top:4px;line-height:1.4}
+
+/* Feedback row */
+.fb-row{display:flex;gap:4px;padding-left:36px}
+.fb-btn{width:28px;height:28px;border-radius:var(--shape-pill);border:1px solid var(--stroke-subtle);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fb-btn:active{background:var(--surface-ghost)}
+.fb-btn svg{width:14px;height:14px;color:var(--grey-60)}
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h20V2z M12 12 L22 2 L22 22 Z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header-nav">
+    <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.29 12.71l6 6a1.004 1.004 0 101.42-1.42L5.41 13H21a1 1 0 100-2H5.41l4.3-4.29a1 1 0 000-1.42 1 1 0 00-1.42 0l-6 6a1 1 0 000 1.42z"/></svg></button>
+    <div class="hn-center">
+      <div class="hn-title">AI Fashion Assistant</div>
+      <div class="hn-sub">Shopping</div>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="chat-container" id="chatContainer"></div>
+
+  <!-- Bottom Widget -->
+  <div class="bottom-widget">
+    <div class="bw-container">
+      <div class="bw-input">
+        <input class="bw-real-input" id="chatInput" placeholder="Ask about fashion, outfits, trends..." onkeydown="if(event.key==='Enter')handleSend()" oninput="toggleSendBtn()">
+      </div>
+      <div class="bw-actions">
+        <div class="bw-left">
+          <button class="wib" title="Add"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg></button>
+          <button class="wib" title="Voice input"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 11-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z" fill="currentColor"/></svg></button>
+        </div>
+        <button class="bw-send hidden-send" id="sendBtn" onclick="handleSend()"><svg viewBox="0 0 24 24"><path d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.993.993 0 00-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"/></svg></button>
+        <button class="speak-btn" id="speakBtn"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg><span>Speak</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Voice overlay removed — text-only flows -->
+
+<script>
+const CC = document.getElementById('chatContainer');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+
+/* ── Icon Paths ── */
+const IC = {
+  cart: 'M8.5 19a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm9 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm4.12-12.17A2 2 0 0020 6H6.58l-.41-1.52A2 2 0 004.23 3H3a1 1 0 000 2h1.23l2.83 10.48A2 2 0 009 17h8.67a2 2 0 001.89-1.37l2.34-7a2 2 0 00-.28-1.8z',
+  star: 'M21.37 9.61a1.964 1.964 0 00-1.52-1.284l-4.235-.646-1.899-4.087a1.917 1.917 0 00-3.434 0L8.38 7.68l-4.273.646a1.964 1.964 0 00-1.52 1.283 1.91 1.91 0 00.447 1.901l3.124 3.213-.74 4.553a1.91 1.91 0 002.88 2.07l3.788-2.091 3.788 2.09a1.9 1.9 0 002.88-2.033l-.74-4.552 3.123-3.213a1.91 1.91 0 00.333-1.93z',
+  mic: 'M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 11-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z',
+  arrowBack: 'M2.29 12.71l6 6a1.004 1.004 0 101.42-1.42L5.41 13H21a1 1 0 100-2H5.41l4.3-4.29a1 1 0 000-1.42 1 1 0 00-1.42 0l-6 6a1 1 0 000 1.42z',
+  success: 'M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1.002 1.002 0 01-1.42 0l-3-3a1.003 1.003 0 111.42-1.42l2.29 2.3 5.29-5.3a1.004 1.004 0 011.42 1.42z',
+  copy: 'M12.33 8.82V6H4.87A1.88 1.88 0 003 7.88v12.24A1.88 1.88 0 004.87 22h10.26A1.88 1.88 0 0017 20.12v-9.41h-2.8a1.88 1.88 0 01-1.87-1.89zm8.08-3.23l-3-3A2 2 0 0016 2H8a2 2 0 00-2 2h7a3 3 0 012.12.88l3 3A3 3 0 0119 10v9a2 2 0 002-2V7a2 2 0 00-.59-1.41z',
+  dislike: 'M3.568 6.67l-.55 5A3 3 0 005.998 15h4v3.92a2 2 0 003.94.56l1-4c.04-.157.06-.318.06-.48V4h-8.45a3 3 0 00-2.98 2.67zM18.998 4h-2v11h2a2 2 0 002-2V6a2 2 0 00-2-2z',
+  like: 'M3.568 17.33l.55-5A3 3 0 015.998 9h4V5.08a2 2 0 013.94-.56l-1 4c-.04.157-.06.318-.06.48V20h-8.45a3 3 0 01-2.98-2.67zM18.998 20h-2V9h2a2 2 0 012 2v7a2 2 0 01-2 2z',
+  chevR: 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z',
+  fashion: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+  check: 'M9 16.2l-3.5-3.5a1 1 0 00-1.4 1.4l4.19 4.19c.39.39 1.02.39 1.41 0L19.8 8.3a1 1 0 00-1.4-1.4L9 16.2z',
+};
+
+const svg = (d,w=18,h=18) => `<svg viewBox="0 0 24 24" fill="none" width="${w}" height="${h}"><path d="${d}" fill="currentColor"/></svg>`;
+
+/* ── State ── */
+let isNewUser = false;
+let onboarded = false;
+let activeCat = '';
+let voiceFlowType = '';
+const user = { name: 'Shreya', gender: 'Women', style: 'Indo-Western', occasions: ['Festive','Casual'], budget: 2000 };
+
+/* ── Product Data ── */
+const products = {
+  kurtas: [
+    { name:'Cotton Printed A-Line Kurta', brand:'AVAASA MIX N MATCH', price:599, mrp:999, rating:4.3, discount:'40% OFF', badge:'Bestseller', img:'', color:'#E8F5E9', abbr:'AV' },
+    { name:'Embroidered Straight Kurta', brand:'AJIO OWN', price:749, mrp:1499, rating:4.5, discount:'50% OFF', badge:'Top Rated', img:'', color:'#E3F2FD', abbr:'AJ' },
+    { name:'Floral Print Anarkali Kurta', brand:'INDIE PICKS', price:689, mrp:1299, rating:4.1, discount:'47% OFF', badge:'New', img:'', color:'#FCE4EC', abbr:'IP' },
+    { name:'Chikankari Cotton Kurta', brand:'FABINDIA', price:799, mrp:1199, rating:4.6, discount:'33% OFF', badge:'Premium', img:'', color:'#FFF3E0', abbr:'FB' },
+  ],
+  sneakers: [
+    { name:'RetroRun White Sneakers', brand:'NIKE', price:1899, mrp:2995, rating:4.6, discount:'37% OFF', badge:'Trending', img:'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&h=380&fit=crop', color:'#E8EAF6', abbr:'NK' },
+    { name:'Classic Canvas Lace-Ups', brand:'PUMA', price:1499, mrp:2499, rating:4.4, discount:'40% OFF', badge:'', img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=380&fit=crop', color:'#FFEBEE', abbr:'PM' },
+    { name:'Ultra Bounce Running Shoes', brand:'ADIDAS', price:1799, mrp:3299, rating:4.7, discount:'45% OFF', badge:'Bestseller', img:'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=300&h=380&fit=crop', color:'#E0F2F1', abbr:'AD' },
+    { name:'Ward Retro Lo Sneakers', brand:'VANS', price:1599, mrp:2799, rating:4.2, discount:'43% OFF', badge:'', img:'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=300&h=380&fit=crop', color:'#FFF8E1', abbr:'VN' },
+  ],
+  tryonProducts: [
+    { id:'lehenga', name:'Embroidered Lehenga Set', brand:'INDYA', price:4999, mrp:8999, color:'#FCE4EC' },
+    { id:'saree', name:'Banarasi Silk Saree', brand:'FABINDIA', price:3499, mrp:5999, color:'#FFF3E0' },
+    { id:'dress', name:'Fit & Flare Midi Dress', brand:'TRENDYOL', price:1299, mrp:2499, color:'#E8F5E9' },
+  ],
+  diwaliOutfit: {
+    items: [
+      { name:'Silk Blend Embroidered Kurta', brand:'MANISH MALHOTRA', price:2499, mrp:4999, img:'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=100&h=100&fit=crop', color:'#E3F2FD', abbr:'MM' },
+      { name:'Palazzo Pants — Gold Zari', brand:'BIBA', price:999, mrp:1799, img:'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=100&h=100&fit=crop', color:'#FFF3E0', abbr:'BB' },
+      { name:'Dupatta — Bandhani Print', brand:'W', price:599, mrp:999, img:'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=100&h=100&fit=crop', color:'#FCE4EC', abbr:'W' },
+      { name:'Embroidered Juttis', brand:'NEEDLEDUST', price:1299, mrp:1999, img:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=100&h=100&fit=crop', color:'#E8F5E9', abbr:'ND' },
+      { name:'Kundan Chandbali Earrings', brand:'ZAVERI PEARLS', price:449, mrp:799, img:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=100&h=100&fit=crop', color:'#FFF8E1', abbr:'ZP' },
+    ],
+    total: 5845,
+    mrpTotal: 10495,
+    saving: 4650,
+  }
+};
+
+/* ── Helpers ── */
+const delay = ms => new Promise(r => setTimeout(r, ms));
+function scroll() { setTimeout(() => CC.scrollTop = CC.scrollHeight, 50); }
+
+const AVATAR = `<div class="msg-avatar"><video autoplay loop muted playsinline src="https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Light/Idle_state.mp4"></video></div>`;
+
+function addAI(html, noAv) {
+  const r = document.createElement('div'); r.className = 'msg-row ai fade-in';
+  r.innerHTML = `${noAv ? '<div style="width:28px;flex-shrink:0"></div>' : AVATAR}<div class="msg-content"><div class="msg-bubble">${html}</div></div>`;
+  CC.appendChild(r); scroll(); return r;
+}
+function addUser(text) {
+  const r = document.createElement('div'); r.className = 'msg-row user fade-in';
+  r.innerHTML = `<div class="msg-bubble">${text}</div>`;
+  CC.appendChild(r); scroll();
+}
+function addVoiceUser(text) {
+  const r = document.createElement('div'); r.className = 'msg-row user fade-in';
+  r.innerHTML = `<div class="voice-bubble"><div class="voice-wave"><span></span><span></span><span></span><span></span><span></span></div><div class="voice-label">${text}</div></div>`;
+  CC.appendChild(r); scroll();
+}
+function addCard(html, noAv) {
+  const r = document.createElement('div'); r.className = 'msg-row ai fade-in';
+  r.innerHTML = `${noAv ? '<div style="width:28px;flex-shrink:0"></div>' : AVATAR}<div class="msg-content card-wrap">${html}</div>`;
+  CC.appendChild(r); scroll(); return r;
+}
+function addChips(chips) {
+  const r = document.createElement('div'); r.className = 'chip-row fade-in';
+  r.innerHTML = chips.map(c => `<button class="chip ${c.style}" onclick="${c.action}">${c.label}</button>`).join('');
+  CC.appendChild(r); scroll();
+}
+function addFeedback() {
+  const r = document.createElement('div'); r.className = 'fb-row fade-in';
+  r.innerHTML = `<button class="fb-btn">${svg(IC.like,14,14)}</button><button class="fb-btn">${svg(IC.dislike,14,14)}</button><button class="fb-btn">${svg(IC.copy,14,14)}</button>`;
+  CC.appendChild(r); scroll();
+}
+function showTyping() {
+  const r = document.createElement('div'); r.className = 'typing-row fade-in'; r.id = 'typingRow';
+  r.innerHTML = `${AVATAR}<div class="typing-dots"><span></span><span></span><span></span></div>`;
+  CC.appendChild(r); scroll();
+}
+function hideTyping() { const e = document.getElementById('typingRow'); if(e) e.remove(); }
+function clearChips() { document.querySelectorAll('.chip-row').forEach(r => r.remove()); }
+
+function toggleSendBtn() {
+  const v = chatInput.value.trim();
+  sendBtn.classList.toggle('hidden-send', !v);
+  document.getElementById('speakBtn').style.display = v ? 'none' : 'flex';
+}
+
+function goBack() {
+  CC.innerHTML = '';
+  startConversation();
+}
+
+async function backToUseCases() {
+  clearChips();
+  const catNames = { clothing: 'Clothing', footwear: 'Footwear', accessories: 'Accessories' };
+  showTyping(); await delay(400); hideTyping();
+  addAI(`What else would you like to do with <b>${catNames[activeCat] || 'Fashion'}</b>?`);
+  await delay(200);
+  addChips([
+    { label: 'Let me discover', style: 'chip-primary', action: `startVoiceDiscovery('${activeCat}')` },
+    { label: 'Style Advisor', style: 'chip-sparkle', action: `startStyleAdvisor('${activeCat}')` },
+    { label: 'Virtual Try-On', style: 'chip-outline', action: `startTryOn('${activeCat}')` },
+    { label: 'Change category', style: 'chip-secondary', action: 'goBack()' },
+  ]);
+}
+
+/* ── Product Card Builder ── */
+function productCardHTML(p) {
+  return `<div class="product-card">
+    <div class="product-card-img" style="background:${p.color};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-direction:column;gap:6px">${p.img ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0" onerror="this.remove()">` : ''}<svg viewBox="0 0 24 24" fill="none" width="40" height="40" style="opacity:0.15"><path d="M7.74 8H16.26C16.7994 7.07134 17.045 6.00119 16.9647 4.93027C16.8844 3.85936 16.4818 2.83782 15.81 2L14.4 2.38C14.2706 2.41648 14.1499 2.47867 14.0451 2.56286C13.9403 2.64705 13.8535 2.75152 13.79 2.87C13.6241 3.20281 13.3688 3.48279 13.0526 3.67849C12.7364 3.8742 12.3719 3.97787 12 3.97787C11.6281 3.97787 11.2636 3.8742 10.9474 3.67849C10.6312 3.48279 10.3759 3.20281 10.21 2.87C10.1465 2.75152 10.0597 2.64705 9.95491 2.56286C9.8501 2.47867 9.72939 2.41648 9.6 2.38L8.19 2C7.51816 2.83782 7.11561 3.85936 7.0353 4.93027C6.95498 6.00119 7.20065 7.07134 7.74 8ZM16.4 11C16.2092 10.6927 16.0738 10.3542 16 10H8.05C7.96082 10.3575 7.80842 10.6962 7.6 11C6.12 13.09 4 16.28 4 19C4 23 20 23 20 19C20 16.28 17.88 13.09 16.4 11Z" fill="currentColor"/></svg><span style="font-size:14px;font-weight:900;color:rgba(0,0,0,0.12);letter-spacing:-0.5px">${p.brand.split(' ')[0]}</span></div>
+    <div class="product-card-body">
+      <div class="product-card-brand">${p.brand}</div>
+      <div class="product-card-name">${p.name}</div>
+      <div class="product-card-meta">
+        <span class="product-card-price">\u20B9${p.price}</span>
+        <span class="product-card-mrp">\u20B9${p.mrp}</span>
+        <span class="product-card-discount">${p.discount}</span>
+      </div>
+      <div class="product-card-rating">${svg(IC.star,11,11)} ${p.rating}</div>
+      ${p.badge ? `<div class="product-card-badge">${p.badge}</div>` : ''}
+      <button class="product-card-cta" onclick="addToCart('${p.name}',${p.price})">Add to Bag</button>
+    </div>
+  </div>`;
+}
+
+function prodRowHTML(p) {
+  return `<div class="prod-row">
+    <div class="prod-thumb" style="background:${p.color};color:${p.color === '#E8F5E9' ? '#2E7D32' : '#333'}">${p.abbr}</div>
+    <div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-variant">${p.brand}</div>
+      <div class="prod-meta"><div class="prod-rating">${svg(IC.star,12,12)} ${p.rating || '4.5'}</div>${p.badge ? `<span class="prod-badge">${p.badge}</span>` : ''}</div>
+    </div>
+    <div class="prod-price-col"><div class="prod-price">\u20B9${p.price}</div>${p.mrp > p.price ? `<div class="prod-mrp">\u20B9${p.mrp}</div>` : ''}</div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   WELCOME SCREEN
+   ══════════════════════════════════════════════ */
+function showWelcomeCards() {
+  addCard(`<div class="cat-cards">
+    <div class="cat-card" onclick="selectCategory('clothing')">
+      <div class="cat-card-icon" style="background:var(--primary-20)"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M7.74 8H16.26C16.7994 7.07134 17.045 6.00119 16.9647 4.93027C16.8844 3.85936 16.4818 2.83782 15.81 2L14.4 2.38C14.2706 2.41648 14.1499 2.47867 14.0451 2.56286C13.9403 2.64705 13.8535 2.75152 13.79 2.87C13.6241 3.20281 13.3688 3.48279 13.0526 3.67849C12.7364 3.8742 12.3719 3.97787 12 3.97787C11.6281 3.97787 11.2636 3.8742 10.9474 3.67849C10.6312 3.48279 10.3759 3.20281 10.21 2.87C10.1465 2.75152 10.0597 2.64705 9.95491 2.56286C9.8501 2.47867 9.72939 2.41648 9.6 2.38L8.19 2C7.51816 2.83782 7.11561 3.85936 7.0353 4.93027C6.95498 6.00119 7.20065 7.07134 7.74 8ZM16.4 11C16.2092 10.6927 16.0738 10.3542 16 10H8.05C7.96082 10.3575 7.80842 10.6962 7.6 11C6.12 13.09 4 16.28 4 19C4 23 20 23 20 19C20 16.28 17.88 13.09 16.4 11Z" fill="currentColor"/></svg></div>
+      <div class="cat-card-text"><div class="cat-card-title">Clothing</div><div class="cat-card-sub">Kurtas, dresses, shirts, ethnic wear</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+    <div class="cat-card" onclick="selectCategory('footwear')">
+      <div class="cat-card-icon" style="background:var(--sparkle-20)"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M14.5 6C14.7967 6 15.0867 5.91203 15.3334 5.7472C15.58 5.58238 15.7723 5.34811 15.8858 5.07403C15.9994 4.79994 16.0291 4.49834 15.9712 4.20737C15.9133 3.91639 15.7704 3.64912 15.5607 3.43934C15.3509 3.22956 15.0836 3.0867 14.7926 3.02882C14.5017 2.97094 14.2001 3.00065 13.926 3.11418C13.6519 3.22771 13.4176 3.41997 13.2528 3.66665C13.088 3.91332 13 4.20333 13 4.5C13 4.89783 13.158 5.27936 13.4393 5.56066C13.7206 5.84197 14.1022 6 14.5 6ZM20 9.68C19.9583 9.55506 19.8922 9.43959 19.8057 9.34024C19.7192 9.24089 19.6139 9.1596 19.4959 9.10106C19.3779 9.04252 19.2495 9.00787 19.1181 8.99911C18.9866 8.99035 18.8547 9.00764 18.73 9.05L16.73 9.72C16.576 9.77159 16.4117 9.78489 16.2515 9.75875C16.0912 9.73262 15.9396 9.66783 15.81 9.57L12.92 7.44C12.6008 7.20053 12.237 7.02715 11.85 6.93L9.1 6.25C8.69503 6.14825 8.27328 6.13216 7.86173 6.20276C7.45018 6.27336 7.05791 6.4291 6.71 6.66L4.45 8.17C4.32739 8.23577 4.21985 8.32641 4.13426 8.43611C4.04867 8.54581 3.98692 8.67217 3.95295 8.8071C3.91898 8.94203 3.91355 9.08257 3.93699 9.21972C3.96044 9.35687 4.01225 9.48762 4.0891 9.60361C4.16596 9.71959 4.26618 9.81826 4.38335 9.89331C4.50052 9.96835 4.63206 10.0181 4.76955 10.0394C4.90705 10.0607 5.04749 10.0531 5.18187 10.0171C5.31626 9.98099 5.44164 9.91728 5.55 9.83L7.82 8.32C7.9376 8.24522 8.06879 8.19437 8.20606 8.17034C8.34333 8.14632 8.484 8.1496 8.62 8.18L11 8.78L7.62 16.41C7.54044 16.587 7.41109 16.737 7.24773 16.8418C7.08437 16.9466 6.89406 17.0015 6.7 17H4C3.73478 17 3.48043 17.1054 3.29289 17.2929C3.10536 17.4804 3 17.7348 3 18C3 18.2652 3.10536 18.5196 3.29289 18.7071C3.48043 18.8946 3.73478 19 4 19H6.7C7.27989 18.9999 7.84731 18.8317 8.33359 18.5158C8.81987 18.1998 9.20418 17.7498 9.44 17.22L10.5 14.84C10.5563 14.8825 10.6166 14.9193 10.68 14.95L12.58 15.58C12.748 15.6347 12.8985 15.7329 13.0161 15.8646C13.1338 15.9964 13.2145 16.1569 13.25 16.33L14 20.2C14.0468 20.4293 14.1724 20.6349 14.3551 20.7811C14.5379 20.9272 14.7661 21.0047 15 21H15.2C15.3326 20.9762 15.459 20.9259 15.5716 20.8521C15.6843 20.7783 15.7809 20.6825 15.8556 20.5704C15.9303 20.4583 15.9816 20.3323 16.0064 20.1999C16.0312 20.0676 16.0291 19.9315 16 19.8L15.23 15.94C15.126 15.4202 14.8862 14.9372 14.5349 14.5402C14.1836 14.1432 13.7333 13.8464 13.23 13.68L11.34 13.05L12.74 9.8L14.56 11.17C15.0793 11.5595 15.7109 11.77 16.36 11.77C16.6826 11.7699 17.0031 11.7193 17.31 11.62L19.31 10.95C19.4403 10.9146 19.5621 10.8531 19.6681 10.7693C19.774 10.6855 19.8619 10.5811 19.9263 10.4624C19.9908 10.3437 20.0306 10.2132 20.0433 10.0788C20.0559 9.94428 20.0412 9.80863 20 9.68Z" fill="currentColor"/></svg></div>
+      <div class="cat-card-text"><div class="cat-card-title">Footwear</div><div class="cat-card-sub">Sneakers, heels, juttis, sandals</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+    <div class="cat-card" onclick="selectCategory('accessories')">
+      <div class="cat-card-icon" style="background:var(--secondary-20)"><svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M13.25 6.11L14.54 4.67C14.7059 4.48625 14.7977 4.24752 14.7977 4C14.7977 3.75248 14.7059 3.51375 14.54 3.33L13.64 2.33C13.5465 2.22641 13.4324 2.14353 13.3049 2.0867C13.1775 2.02986 13.0396 2.00033 12.9 2H11.1C10.9605 2.00033 10.8225 2.02986 10.6951 2.0867C10.5676 2.14353 10.4535 2.22641 10.36 2.33L9.46001 3.33C9.29417 3.51375 9.20238 3.75248 9.20238 4C9.20238 4.24752 9.29417 4.48625 9.46001 4.67L10.75 6.11C8.76154 6.42456 6.96476 7.47728 5.71817 9.05811C4.47159 10.6389 3.86685 12.6317 4.02462 14.6387C4.18238 16.6457 5.09106 18.5194 6.56933 19.8861C8.04761 21.2527 9.98681 22.0117 12 22.0117C14.0132 22.0117 15.9524 21.2527 17.4307 19.8861C18.909 18.5194 19.8176 16.6457 19.9754 14.6387C20.1332 12.6317 19.5284 10.6389 18.2819 9.05811C17.0353 7.47728 15.2385 6.42456 13.25 6.11ZM12 20C10.8133 20 9.65329 19.6481 8.66659 18.9888C7.6799 18.3295 6.91086 17.3925 6.45674 16.2961C6.00261 15.1997 5.88379 13.9933 6.1153 12.8295C6.34681 11.6656 6.91826 10.5965 7.75737 9.75736C8.59649 8.91824 9.66559 8.3468 10.8295 8.11529C11.9934 7.88378 13.1998 8.0026 14.2961 8.45672C15.3925 8.91085 16.3295 9.67988 16.9888 10.6666C17.6481 11.6533 18 12.8133 18 14C18 15.5913 17.3679 17.1174 16.2427 18.2426C15.1174 19.3679 13.5913 20 12 20Z" fill="currentColor"/></svg></div>
+      <div class="cat-card-text"><div class="cat-card-title">Accessories</div><div class="cat-card-sub">Bags, jewelry, watches, sunglasses</div></div>
+      <div class="cat-card-arrow">${svg(IC.chevR)}</div>
+    </div>
+  </div>`, true);
+  if (!onboarded) {
+    addChips([{ label: "I'm new to AJIO", style: 'chip-outline', action: 'startNewUser()' }]);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CATEGORY → USE CASE CHIPS
+   ══════════════════════════════════════════════ */
+async function selectCategory(cat) {
+  clearChips(); activeCat = cat;
+  const catNames = { clothing: 'Clothing', footwear: 'Footwear', accessories: 'Accessories' };
+  addUser(catNames[cat]);
+  showTyping(); await delay(800); hideTyping();
+  addAI(`Great choice! What would you like to do with <b>${catNames[cat]}</b>?`);
+  await delay(300);
+  addChips([
+    { label: 'Let me discover', style: 'chip-primary', action: `startVoiceDiscovery('${cat}')` },
+    { label: 'Style Advisor', style: 'chip-sparkle', action: `startStyleAdvisor('${cat}')` },
+    { label: 'Virtual Try-On', style: 'chip-outline', action: `startTryOn('${cat}')` },
+  ]);
+}
+
+/* ══════════════════════════════════════════════
+   NEW USER ONBOARDING
+   ══════════════════════════════════════════════ */
+async function startNewUser() {
+  clearChips(); isNewUser = true;
+  addUser("I'm new to AJIO");
+  showTyping(); await delay(1000); hideTyping();
+  addAI("Welcome to AJIO! I'm your AI Fashion Assistant. Let me set up your fashion profile \u2014 just 4 quick questions!");
+  await delay(600);
+  addAI('Who are you shopping for?', true);
+  addChips([
+    { label: 'Women', style: 'chip-outline', action: "onboardGender('Women')" },
+    { label: 'Men', style: 'chip-outline', action: "onboardGender('Men')" },
+    { label: 'Kids', style: 'chip-outline', action: "onboardGender('Kids')" },
+  ]);
+}
+
+async function onboardGender(gender) {
+  clearChips(); addUser(gender); user.gender = gender;
+  showTyping(); await delay(600); hideTyping();
+  addAI('What\u2019s your style preference?', true);
+  addChips([
+    { label: 'Ethnic', style: 'chip-outline', action: "onboardStyle('Ethnic')" },
+    { label: 'Western', style: 'chip-outline', action: "onboardStyle('Western')" },
+    { label: 'Indo-Western', style: 'chip-outline', action: "onboardStyle('Indo-Western')" },
+    { label: 'All styles', style: 'chip-outline', action: "onboardStyle('All')" },
+  ]);
+}
+
+async function onboardStyle(style) {
+  clearChips(); addUser(style); user.style = style;
+  showTyping(); await delay(600); hideTyping();
+  addAI(`Love it! ${style === 'Ethnic' ? 'Classic taste!' : style === 'Western' ? 'Trendy!' : 'Versatile!'} What occasions do you mostly shop for?`, true);
+  addChips([
+    { label: 'Casual / Daily', style: 'chip-outline', action: "onboardOccasion('Casual')" },
+    { label: 'Festive / Wedding', style: 'chip-outline', action: "onboardOccasion('Festive')" },
+    { label: 'Office / Formal', style: 'chip-outline', action: "onboardOccasion('Office')" },
+    { label: 'Party / Night Out', style: 'chip-outline', action: "onboardOccasion('Party')" },
+  ]);
+}
+
+async function onboardOccasion(occasion) {
+  clearChips(); addUser(occasion); user.occasions = [occasion];
+  showTyping(); await delay(600); hideTyping();
+  addAI('Last one \u2014 what\u2019s your typical budget per piece?', true);
+  addChips([
+    { label: 'Under \u20B9500', style: 'chip-outline', action: 'onboardBudget(500)' },
+    { label: '\u20B9500-1500', style: 'chip-outline', action: 'onboardBudget(1500)' },
+    { label: '\u20B91500-3000', style: 'chip-outline', action: 'onboardBudget(3000)' },
+    { label: '\u20B93000+', style: 'chip-outline', action: 'onboardBudget(5000)' },
+  ]);
+}
+
+async function onboardBudget(budget) {
+  onboarded = true; clearChips();
+  addUser(budget <= 500 ? 'Under \u20B9500' : budget <= 1500 ? '\u20B9500-1500' : budget <= 3000 ? '\u20B91500-3000' : '\u20B93000+');
+  user.budget = budget;
+  showTyping(); await delay(800); hideTyping();
+  addAI('Your style profile is ready!', true);
+  await delay(400);
+  addCard(`<div class="profile-card">
+    <div class="profile-icon">${svg(IC.check,20,20)}</div>
+    <div class="profile-text"><b>Shopping for:</b> ${user.gender} | <b>Style:</b> ${user.style} | <b>For:</b> ${user.occasions.join(', ')} | <b>Budget:</b> \u20B9${budget.toLocaleString('en-IN')}</div>
+  </div>`, true);
+  await delay(400);
+  addAI('Now I can give you personalised fashion recommendations every time. What would you like to explore?', true);
+  await delay(300);
+  showWelcomeCards();
+}
+
+/* ══════════════════════════════════════════════
+   USE CASE 1: VOICE-FIRST FASHION DISCOVERY
+   ══════════════════════════════════════════════ */
+async function startVoiceDiscovery(cat) {
+  clearChips();
+  activeCat = cat;
+  if (cat === 'clothing') {
+    const g = user.gender;
+    addAI(`What type of clothing are you looking for?`);
+    await delay(300);
+    if (g === 'Women') {
+      addChips([
+        { label: 'Kurtas', style: 'chip-outline', action: "pickClothingType('kurta')" },
+        { label: 'Dresses', style: 'chip-outline', action: "pickClothingType('dress')" },
+        { label: 'Sarees', style: 'chip-outline', action: "pickClothingType('saree')" },
+        { label: 'Jeans', style: 'chip-outline', action: "pickClothingType('jeans')" },
+      ]);
+    } else if (g === 'Men') {
+      addChips([
+        { label: 'Kurtas', style: 'chip-outline', action: "pickClothingType('kurta')" },
+        { label: 'Shirts', style: 'chip-outline', action: "pickClothingType('shirt')" },
+        { label: 'T-Shirts', style: 'chip-outline', action: "pickClothingType('tshirt')" },
+        { label: 'Jeans', style: 'chip-outline', action: "pickClothingType('jeans')" },
+      ]);
+    } else {
+      addChips([
+        { label: 'Kurtas', style: 'chip-outline', action: "pickClothingType('kurta')" },
+        { label: 'Shirts', style: 'chip-outline', action: "pickClothingType('shirt')" },
+        { label: 'Dresses', style: 'chip-outline', action: "pickClothingType('dress')" },
+        { label: 'T-Shirts', style: 'chip-outline', action: "pickClothingType('tshirt')" },
+      ]);
+    }
+  } else if (cat === 'footwear') {
+    addAI('What are you looking for?');
+    await delay(300);
+    addChips([
+      { label: 'Sneakers', style: 'chip-outline', action: "pickClothingType('sneakers')" },
+      { label: 'Running Shoes', style: 'chip-outline', action: "pickClothingType('running')" },
+      { label: 'Sandals', style: 'chip-outline', action: "pickClothingType('sandals')" },
+      { label: 'Juttis / Mojaris', style: 'chip-outline', action: "pickClothingType('juttis')" },
+    ]);
+  } else {
+    addAI('What are you looking for?');
+    await delay(300);
+    addChips([
+      { label: 'Earrings', style: 'chip-outline', action: "pickClothingType('earrings')" },
+      { label: 'Handbags', style: 'chip-outline', action: "pickClothingType('bag')" },
+      { label: 'Watches', style: 'chip-outline', action: "pickClothingType('watches')" },
+      { label: 'Sunglasses', style: 'chip-outline', action: "pickClothingType('sunglasses')" },
+    ]);
+  }
+}
+
+async function pickClothingType(type) {
+  clearChips();
+  const typeNames = { kurta:'Kurtas', shirt:'Shirts', dress:'Dresses', tshirt:'T-Shirts', jeans:'Jeans', saree:'Sarees', sneakers:'Sneakers', running:'Running Shoes', sandals:'Sandals', juttis:'Juttis', earrings:'Earrings', bag:'Handbags', watches:'Watches', sunglasses:'Sunglasses' };
+  addUser(typeNames[type] || type);
+  // Start guided discovery quiz for this product type
+  await startDiscoveryQuiz(type);
+}
+
+/* ── Discovery Quiz: guided preference collection ── */
+let discoverPrefs = {};
+
+const quizSteps = {
+  kurta: [
+    { q: 'What style of kurta?', key: 'style', opts: ['A-Line', 'Straight', 'Anarkali', 'Any'] },
+    { q: 'What size?', key: 'size', opts: ['XS', 'S', 'M', 'L'] },
+    { q: 'Preferred color?', key: 'color', opts: ['Blue', 'White', 'Maroon', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B9500', '\u20B9500\u20131000', '\u20B91000\u20132000', 'No limit'] },
+  ],
+  jeans: [
+    { q: 'What fit do you prefer?', key: 'style', opts: ['Slim Fit', 'Straight', 'Bootcut', 'Any'] },
+    { q: 'What size?', key: 'size', opts: ['26', '28', '30', '32'] },
+    { q: 'What color?', key: 'color', opts: ['Blue', 'Black', 'Grey', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B9500', '\u20B9500\u20131000', '\u20B91000\u20132000', 'No limit'] },
+  ],
+  dress: [
+    { q: 'What type of dress?', key: 'style', opts: ['Midi', 'Maxi', 'Fit & Flare', 'Any'] },
+    { q: 'What size?', key: 'size', opts: ['XS', 'S', 'M', 'L'] },
+    { q: 'Preferred color?', key: 'color', opts: ['Black', 'Floral', 'Red', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B91000', '\u20B91000\u20132000', '\u20B92000\u20134000', 'No limit'] },
+  ],
+  shirt: [
+    { q: 'What type of shirt?', key: 'style', opts: ['Formal', 'Casual', 'Linen', 'Any'] },
+    { q: 'What size?', key: 'size', opts: ['S', 'M', 'L', 'XL'] },
+    { q: 'Preferred color?', key: 'color', opts: ['White', 'Blue', 'Black', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B9500', '\u20B9500\u20131000', '\u20B91000\u20132000', 'No limit'] },
+  ],
+  tshirt: [
+    { q: 'What style?', key: 'style', opts: ['Round Neck', 'Polo', 'V-Neck', 'Any'] },
+    { q: 'What size?', key: 'size', opts: ['S', 'M', 'L', 'XL'] },
+    { q: 'Preferred color?', key: 'color', opts: ['Black', 'White', 'Navy', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B9300', '\u20B9300\u2013500', '\u20B9500\u20131000', 'No limit'] },
+  ],
+  saree: [
+    { q: 'What type of saree?', key: 'style', opts: ['Silk', 'Cotton', 'Georgette', 'Any'] },
+    { q: 'For what occasion?', key: 'occasion', opts: ['Festive', 'Wedding', 'Daily Wear', 'Any'] },
+    { q: 'Preferred color?', key: 'color', opts: ['Red', 'Gold', 'Green', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B91000', '\u20B91000\u20133000', '\u20B93000\u20135000', 'No limit'] },
+  ],
+  sneakers: [
+    { q: 'What type?', key: 'style', opts: ['Casual', 'Running', 'High-Top', 'Any'] },
+    { q: 'What size (UK)?', key: 'size', opts: ['6', '7', '8', '9'] },
+    { q: 'Preferred color?', key: 'color', opts: ['White', 'Black', 'Multi', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B91000', '\u20B91000\u20132000', '\u20B92000\u20134000', 'No limit'] },
+  ],
+  running: [
+    { q: 'What\u2019s your priority?', key: 'style', opts: ['Lightweight', 'Cushioned', 'Stability', 'Any'] },
+    { q: 'What size (UK)?', key: 'size', opts: ['6', '7', '8', '9'] },
+    { q: 'Preferred brand?', key: 'color', opts: ['Nike', 'Adidas', 'Puma', 'Any'] },
+    { q: 'Your budget?', key: 'budget', opts: ['Under \u20B91500', '\u20B91500\u20133000', '\u20B93000\u20135000', 'No limit'] },
+  ],
+};
+
+// Default quiz for product types without specific steps
+const defaultQuiz = [
+  { q: 'What style?', key: 'style', opts: ['Classic', 'Trendy', 'Minimal', 'Statement'] },
+  { q: 'Preferred color?', key: 'color', opts: ['Gold', 'Silver', 'Black', 'Any'] },
+  { q: 'Your budget?', key: 'budget', opts: ['Under \u20B9500', '\u20B9500\u20131000', '\u20B91000\u20132000', '\u20B92000+'] },
+];
+
+let isRefine = false;
+const skipOnRefine = ['size', 'budget']; // These stick from first search
+
+async function startDiscoveryQuiz(type) {
+  if (discoverPrefs.type === type && discoverPrefs.size) {
+    // Refine mode — keep size & budget, only re-ask style & color
+    isRefine = true;
+    showTyping(); await delay(400); hideTyping();
+    addAI('Let\u2019s refine! Your size <b>' + (discoverPrefs.size||'') + '</b> and budget <b>' + (discoverPrefs.budget||'') + '</b> are saved.');
+    await delay(300);
+  } else {
+    isRefine = false;
+    discoverPrefs = { type: type };
+  }
+  const steps = quizSteps[type] || defaultQuiz;
+  await runQuizStep(type, steps, 0);
+}
+
+async function runQuizStep(type, steps, idx) {
+  if (idx >= steps.length) {
+    isRefine = false;
+    await showDiscoveryResults(type);
+    return;
+  }
+  const step = steps[idx];
+  // Skip size & budget on refine if already set
+  if (isRefine && skipOnRefine.includes(step.key) && discoverPrefs[step.key]) {
+    await runQuizStep(type, steps, idx + 1);
+    return;
+  }
+  if (idx === 0 || (isRefine && !skipOnRefine.includes(step.key))) {
+    showTyping(); await delay(400); hideTyping();
+  }
+  addAI(step.q, idx > 0 && !isRefine);
+  await delay(200);
+  addChips(step.opts.map(o => ({
+    label: o, style: 'chip-outline',
+    action: `quizAnswer('${type}',${idx},'${o.replace(/'/g,"\\'")}')`
+  })));
+}
+
+async function quizAnswer(type, idx, answer) {
+  clearChips();
+  const steps = quizSteps[type] || defaultQuiz;
+  discoverPrefs[steps[idx].key] = answer;
+  addUser(answer);
+  await delay(300);
+  await runQuizStep(type, steps, idx + 1);
+}
+
+async function showDiscoveryResults(type) {
+  showTyping(); await delay(1200); hideTyping();
+  const typeNames = { kurta:'kurtas', shirt:'shirts', dress:'dresses', tshirt:'t-shirts', jeans:'jeans', saree:'sarees', sneakers:'sneakers', running:'running shoes', sandals:'sandals', juttis:'juttis', earrings:'earrings', bag:'handbags', watches:'watches', sunglasses:'sunglasses' };
+  const prefSummary = Object.entries(discoverPrefs).filter(([k]) => k !== 'type').map(([k,v]) => v).filter(v => v !== 'Any').join(' \u2022 ');
+
+  // Generate dynamic product cards that match the user's preferences
+  const isFootwear = ['sneakers','running','sandals','juttis'].includes(type);
+  const basePool = isFootwear ? products.sneakers : products.kurtas;
+  const budget = discoverPrefs.budget || '';
+  const color = discoverPrefs.color || 'Any';
+  const style = discoverPrefs.style || '';
+  const size = discoverPrefs.size || '';
+
+  // Parse budget ceiling
+  let maxPrice = 99999;
+  const budgetMatch = budget.match(/(\d[\d,]*)/);
+  if (budget.toLowerCase().includes('under') && budgetMatch) maxPrice = parseInt(budgetMatch[1].replace(/,/g,''));
+  else if (budgetMatch) {
+    const nums = budget.match(/\d[\d,]*/g);
+    if (nums && nums.length >= 2) maxPrice = parseInt(nums[1].replace(/,/g,''));
+    else if (nums) maxPrice = parseInt(nums[0].replace(/,/g,''));
+  }
+
+  // Build result cards that match preferences
+  const colorMap = { 'Blue':'#E3F2FD', 'Black':'#2D2D2D', 'White':'#F5F5F5', 'Maroon':'#FCE4EC', 'Red':'#FFEBEE', 'Grey':'#ECEFF1', 'Gold':'#FFF3E0', 'Green':'#E8F5E9', 'Navy':'#E3F2FD', 'Floral':'#FCE4EC', 'Multi':'#E8EAF6' };
+  const bgColor = (color !== 'Any' && colorMap[color]) ? colorMap[color] : undefined;
+
+  const dynamicResults = [];
+  const styleLabel = style || typeNames[type];
+  const brandPool = isFootwear
+    ? ['NIKE','ADIDAS','PUMA','VANS','REEBOK','NEW BALANCE']
+    : ['AVAASA','AJIO OWN','INDIE PICKS','FABINDIA','BIBA','W','AURELIA','LIBAS'];
+  const abbrPool = isFootwear
+    ? ['NK','AD','PM','VN','RB','NB']
+    : ['AV','AJ','IP','FB','BB','W','AU','LB'];
+
+  for (let i = 0; i < 4; i++) {
+    const price = Math.min(maxPrice - Math.floor(Math.random() * (maxPrice * 0.3)), maxPrice - 50);
+    const mrp = Math.floor(price * (1.4 + Math.random() * 0.5));
+    const discount = Math.round((1 - price / mrp) * 100);
+    const badges = ['Bestseller','Top Rated','New','Premium','Trending',''];
+    dynamicResults.push({
+      name: `${style !== 'Any' && style ? style + ' ' : ''}${color !== 'Any' ? color + ' ' : ''}${typeNames[type] ? typeNames[type].slice(0,1).toUpperCase() + typeNames[type].slice(1,-1) : type}${size && size !== 'Any' ? ' \u2022 ' + size : ''}`,
+      brand: brandPool[i % brandPool.length],
+      price: Math.max(price, 99),
+      mrp: mrp,
+      rating: (4 + Math.random() * 0.8).toFixed(1),
+      discount: discount + '% OFF',
+      badge: badges[i],
+      img: isFootwear ? basePool[i % basePool.length].img : '',
+      color: bgColor || basePool[i % basePool.length].color,
+      abbr: abbrPool[i % abbrPool.length],
+    });
+  }
+
+  addAI(`Found <b>${dynamicResults.length} ${typeNames[type] || type}</b> matching your preferences!`);
+  await delay(200);
+  if (prefSummary) addCard(`<div style="background:var(--primary-20);border-radius:var(--shape-sm);padding:8px 12px;font-size:12px;font-weight:700;color:var(--primary-60);margin-bottom:4px">${prefSummary}</div>`, true);
+  await delay(400);
+
+  // Store results for try-on selection
+  window._lastResults = dynamicResults;
+  addCard(`<div class="product-grid">${dynamicResults.map(p => productCardHTML(p)).join('')}</div>`, true);
+  addFeedback();
+  await delay(300);
+  addChips([
+    { label: 'Show more', style: 'chip-primary', action: `showMoreResults('${type}')` },
+    { label: 'Refine search', style: 'chip-outline', action: `startDiscoveryQuiz('${type}')` },
+    { label: 'Try this on', style: 'chip-sparkle', action: "crossLinkTryOn('item')" },
+    { label: 'Back', style: 'chip-secondary', action: 'backToUseCases()' },
+  ]);
+}
+
+async function showMoreResults(type) {
+  clearChips();
+  addUser('Show more');
+  showTyping(); await delay(800); hideTyping();
+
+  const isFootwear = ['sneakers','running','sandals','juttis'].includes(type);
+  const typeNames = { kurta:'kurtas', shirt:'shirts', dress:'dresses', tshirt:'t-shirts', jeans:'jeans', saree:'sarees', sneakers:'sneakers', running:'running shoes', sandals:'sandals', juttis:'juttis', earrings:'earrings', bag:'handbags', watches:'watches', sunglasses:'sunglasses' };
+  const budget = discoverPrefs.budget || '';
+  const color = discoverPrefs.color || 'Any';
+  const style = discoverPrefs.style || '';
+  const size = discoverPrefs.size || '';
+
+  let maxPrice = 99999;
+  const budgetMatch = budget.match(/(\d[\d,]*)/);
+  if (budget.toLowerCase().includes('under') && budgetMatch) maxPrice = parseInt(budgetMatch[1].replace(/,/g,''));
+  else if (budgetMatch) { const nums = budget.match(/\d[\d,]*/g); if(nums && nums.length>=2) maxPrice = parseInt(nums[1].replace(/,/g,'')); else if(nums) maxPrice = parseInt(nums[0].replace(/,/g,'')); }
+
+  const colorMap = { 'Blue':'#E3F2FD', 'Black':'#2D2D2D', 'White':'#F5F5F5', 'Maroon':'#FCE4EC', 'Red':'#FFEBEE', 'Grey':'#ECEFF1', 'Gold':'#FFF3E0', 'Green':'#E8F5E9', 'Navy':'#E3F2FD', 'Floral':'#FCE4EC', 'Multi':'#E8EAF6' };
+  const bgColor = (color !== 'Any' && colorMap[color]) ? colorMap[color] : undefined;
+  const basePool = isFootwear ? products.sneakers : products.kurtas;
+  const brandPool = isFootwear ? ['REEBOK','NEW BALANCE','ASICS','SKECHERS'] : ['LIBAS','AURELIA','GLOBAL DESI','ANOUK'];
+  const abbrPool = isFootwear ? ['RB','NB','AS','SK'] : ['LB','AU','GD','AN'];
+
+  const moreResults = [];
+  for (let i = 0; i < 4; i++) {
+    const price = Math.min(maxPrice - Math.floor(Math.random() * (maxPrice * 0.3)), maxPrice - 50);
+    const mrp = Math.floor(price * (1.4 + Math.random() * 0.5));
+    const discount = Math.round((1 - price / mrp) * 100);
+    const badges = ['New Arrival','Popular','','Value Pick'];
+    moreResults.push({
+      name: `${style !== 'Any' && style ? style + ' ' : ''}${color !== 'Any' ? color + ' ' : ''}${typeNames[type] ? typeNames[type].slice(0,1).toUpperCase() + typeNames[type].slice(1,-1) : type}${size && size !== 'Any' ? ' \u2022 ' + size : ''}`,
+      brand: brandPool[i], price: Math.max(price, 99), mrp, rating: (4 + Math.random() * 0.8).toFixed(1),
+      discount: discount + '% OFF', badge: badges[i],
+      img: isFootwear ? basePool[i % basePool.length].img : '', color: bgColor || basePool[i % basePool.length].color, abbr: abbrPool[i],
+    });
+  }
+
+  // Append to existing results for try-on card selection
+  window._lastResults = (window._lastResults || []).concat(moreResults);
+
+  addAI(`Here are 4 more ${typeNames[type] || type}:`);
+  await delay(300);
+  addCard(`<div class="product-grid">${moreResults.map(p => productCardHTML(p)).join('')}</div>`, true);
+  addFeedback();
+  await delay(300);
+  addChips([
+    { label: 'Show more', style: 'chip-primary', action: `showMoreResults('${type}')` },
+    { label: 'Refine search', style: 'chip-outline', action: `startDiscoveryQuiz('${type}')` },
+    { label: 'Try this on', style: 'chip-sparkle', action: "crossLinkTryOn('item')" },
+    { label: 'Back', style: 'chip-secondary', action: 'backToUseCases()' },
+  ]);
+}
+
+/* Voice overlay removed — text-only flows */
+
+/* ══════════════════════════════════════════════
+   USE CASE 2: PERSONAL STYLE ADVISOR
+   ══════════════════════════════════════════════ */
+async function startStyleAdvisor(cat) {
+  clearChips();
+  if (isNewUser && !onboarded) {
+    addAI('Let me first learn about your style preferences before recommending outfits!');
+    await delay(400);
+    startNewUser();
+    return;
+  }
+  addAI('What occasion are you styling for?');
+  await delay(300);
+  addChips([
+    { label: 'Diwali outfit', style: 'chip-primary', action: "styleAdvisorFlow('diwali')" },
+    { label: 'Office meeting', style: 'chip-outline', action: "styleAdvisorFlow('office')" },
+    { label: 'Casual weekend', style: 'chip-outline', action: "styleAdvisorFlow('casual')" },
+    { label: 'Wedding guest', style: 'chip-outline', action: "styleAdvisorFlow('wedding')" },
+  ]);
+}
+
+async function styleAdvisorFlow(occasion) {
+  clearChips();
+  const labels = { diwali: 'Diwali ke liye full outfit suggest karo', office: 'Office meeting outfit chahiye', casual: 'Weekend casual look suggest karo', wedding: 'Wedding guest outfit dikhao' };
+  addUser(labels[occasion]);
+  showTyping(); await delay(1800); hideTyping();
+
+  if (occasion === 'diwali') {
+    addAI(`Based on your style profile, ${user.name}! You loved that <b>indigo Anarkali</b> last Navratri \u2014 I\u2019ve built a Diwali look around similar vibes.`);
+    addFeedback();
+    await delay(600);
+
+    const outfit = products.diwaliOutfit;
+    addCard(`<div class="lookbook-card">
+      <div class="lookbook-header">
+        <div class="lookbook-header-icon">${svg(IC.star,18,18)}</div>
+        <div class="lookbook-header-text">
+          <div class="lookbook-header-title">Your Diwali Look</div>
+          <div class="lookbook-header-sub">Styled by AI Fashion Assistant</div>
+        </div>
+      </div>
+      <div class="lookbook-hero">
+        <div class="lookbook-hero-grid">
+          <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=220&fit=crop" alt="Kurta" onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--primary-20);font-size:24px;font-weight:900;color:var(--primary-50)\\'>DIWALI LOOK</div>'">
+          <img src="https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=200&h=220&fit=crop" alt="Dupatta" onerror="this.style.background='var(--secondary-20)'">
+          <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=200&h=220&fit=crop" alt="Juttis" onerror="this.style.background='var(--sparkle-20)'">
+          <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=200&h=220&fit=crop" alt="Earrings" onerror="this.style.background='var(--secondary-20)'">
+        </div>
+        <div class="lookbook-tag">5 items curated for you</div>
+      </div>
+      <div class="lookbook-items">
+        ${outfit.items.map(i => `<div class="lookbook-item">
+          <div class="lookbook-item-thumb" style="background:${i.color};color:#333">${i.abbr}</div>
+          <div class="lookbook-item-info"><div class="lookbook-item-name">${i.name}</div><div class="lookbook-item-brand">${i.brand}</div></div>
+          <div class="lookbook-item-price"><div class="lookbook-item-price-val">\u20B9${i.price}</div><div class="lookbook-item-price-mrp">\u20B9${i.mrp}</div></div>
+        </div>`).join('')}
+      </div>
+      <div class="lookbook-total">
+        <div><div class="cart-total-label">Total Outfit</div><div class="lookbook-total-save">You save \u20B9${outfit.saving.toLocaleString('en-IN')}</div></div>
+        <div class="lookbook-total-val">\u20B9${outfit.total.toLocaleString('en-IN')}</div>
+      </div>
+      <div class="lookbook-cta">
+        <button class="lookbook-cta-btn lookbook-cta-primary" onclick="addFullOutfitToCart()">Add All to Bag</button>
+        <button class="lookbook-cta-btn lookbook-cta-secondary" onclick="void(0)">Save Look</button>
+      </div>
+    </div>`, true);
+
+    await delay(300);
+    addCard(`<div class="why-card">
+      <div class="why-title">Why this outfit for you</div>
+      <div class="why-item"><span class="why-bullet">\u2022</span> <b>Silk blend kurta</b> \u2014 matches your Indo-Western preference</div>
+      <div class="why-item"><span class="why-bullet">\u2022</span> <b>Gold zari palazzo</b> \u2014 complements the kurta\u2019s embroidery</div>
+      <div class="why-item"><span class="why-bullet">\u2022</span> <b>Kundan earrings</b> \u2014 adds festive sparkle within your budget</div>
+    </div>`, true);
+
+    await delay(300);
+    addChips([
+      { label: 'Swap the juttis', style: 'chip-outline', action: "swapItem('juttis')" },
+      { label: 'Different color', style: 'chip-outline', action: "swapItem('color')" },
+      { label: 'Find similar kurtas', style: 'chip-sparkle', action: "crossLinkDiscovery('kurta')" },
+    ]);
+  } else {
+    // Generic advisor flow for other occasions
+    addAI(`Here\u2019s a curated <b>${occasion}</b> look for you based on your preferences!`);
+    addFeedback();
+    await delay(600);
+    addCard(`<div class="lookbook-card">
+      <div class="lookbook-header">
+        <div class="lookbook-header-icon">${svg(IC.star,18,18)}</div>
+        <div class="lookbook-header-text">
+          <div class="lookbook-header-title">Your ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Look</div>
+          <div class="lookbook-header-sub">Styled by AI Fashion Assistant</div>
+        </div>
+      </div>
+      <div class="lookbook-items">
+        ${products.diwaliOutfit.items.slice(0,3).map(i => `<div class="lookbook-item">
+          <div class="lookbook-item-thumb" style="background:${i.color};color:#333">${i.abbr}</div>
+          <div class="lookbook-item-info"><div class="lookbook-item-name">${i.name}</div><div class="lookbook-item-brand">${i.brand}</div></div>
+          <div class="lookbook-item-price"><div class="lookbook-item-price-val">\u20B9${i.price}</div></div>
+        </div>`).join('')}
+      </div>
+      <div class="lookbook-cta">
+        <button class="lookbook-cta-btn lookbook-cta-primary" onclick="addFullOutfitToCart()">Add All to Bag</button>
+      </div>
+    </div>`, true);
+    await delay(300);
+    addChips([
+      { label: 'Swap an item', style: 'chip-outline', action: "swapItem('generic')" },
+      { label: 'Try this on', style: 'chip-sparkle', action: "crossLinkTryOn('outfit')" },
+      { label: 'Back', style: 'chip-secondary', action: 'backToUseCases()' },
+    ]);
+  }
+}
+
+async function swapItem(item) {
+  clearChips();
+  addUser(item === 'juttis' ? 'Swap the juttis' : item === 'color' ? 'Different color kurta' : 'Swap an item');
+  showTyping(); await delay(1000); hideTyping();
+  if (item === 'juttis') {
+    addAI('How about these instead?');
+    await delay(300);
+    addCard(`<div class="lookbook-card">
+      <div class="lookbook-items">
+        <div class="lookbook-item">
+          <div class="lookbook-item-thumb" style="background:#E8F5E9;color:#2E7D32">KS</div>
+          <div class="lookbook-item-info"><div class="lookbook-item-name">Kolhapuri Sandals \u2014 Gold</div><div class="lookbook-item-brand">METRO</div></div>
+          <div class="lookbook-item-price"><div class="lookbook-item-price-val">\u20B9899</div><div class="lookbook-item-price-mrp">\u20B91499</div></div>
+        </div>
+        <div class="lookbook-item">
+          <div class="lookbook-item-thumb" style="background:#FCE4EC;color:#C62828">MJ</div>
+          <div class="lookbook-item-info"><div class="lookbook-item-name">Mojari Embroidered Flats</div><div class="lookbook-item-brand">ANOUK</div></div>
+          <div class="lookbook-item-price"><div class="lookbook-item-price-val">\u20B9699</div><div class="lookbook-item-price-mrp">\u20B91099</div></div>
+        </div>
+      </div>
+    </div>`, true);
+  } else {
+    addAI('Here\u2019s the same look in a <b>maroon</b> palette:');
+    await delay(300);
+    addCard(`<div class="why-card" style="background:var(--secondary-20)">
+      <div class="why-title" style="color:var(--secondary-60)">Color Swap: Navy \u2192 Maroon</div>
+      <div class="why-item"><span class="why-bullet" style="color:var(--secondary-50)">\u2022</span> Maroon silk kurta with gold embroidery</div>
+      <div class="why-item"><span class="why-bullet" style="color:var(--secondary-50)">\u2022</span> Cream palazzo with subtle zari border</div>
+      <div class="why-item"><span class="why-bullet" style="color:var(--secondary-50)">\u2022</span> Same juttis & earrings work perfectly!</div>
+    </div>`, true);
+  }
+  await delay(300);
+  addChips([
+    { label: 'Add to Bag', style: 'chip-primary', action: "addFullOutfitToCart()" },
+    { label: 'Try this on', style: 'chip-sparkle', action: "crossLinkTryOn('outfit')" },
+    { label: 'Back', style: 'chip-secondary', action: 'backToUseCases()' },
+  ]);
+}
+
+/* ══════════════════════════════════════════════
+   USE CASE 3: VIRTUAL TRY-ON STUDIO
+   ══════════════════════════════════════════════ */
+async function startTryOn(cat) {
+  clearChips(); tryOnInProgress = false;
+  addAI('Welcome to <b>Virtual Try-On Studio</b>! Pick a product to try on:');
+  await delay(300);
+  addChips([
+    { label: 'Lehenga Set', style: 'chip-outline', action: "selectTryOnProduct('lehenga')" },
+    { label: 'Banarasi Saree', style: 'chip-outline', action: "selectTryOnProduct('saree')" },
+    { label: 'Midi Dress', style: 'chip-outline', action: "selectTryOnProduct('dress')" },
+  ]);
+}
+
+async function selectTryOnProduct(id) {
+  clearChips();
+  const p = products.tryonProducts.find(x => x.id === id);
+  addUser(p.name);
+  showTyping(); await delay(800); hideTyping();
+  addAI(`Great choice! The <b>${p.name}</b> by ${p.brand} (\u20B9${p.price}). To generate your virtual try-on, I need a photo.`);
+  await delay(400);
+  addChips([
+    { label: 'Use profile photo', style: 'chip-primary', action: `generateTryOn('${id}','profile')` },
+    { label: 'Take new selfie', style: 'chip-outline', action: `generateTryOn('${id}','selfie')` },
+  ]);
+}
+
+let tryOnInProgress = false;
+
+async function generateTryOn(id, mode) {
+  clearChips();
+  tryOnInProgress = false;
+  addUser(mode === 'profile' ? 'Use my profile photo' : 'Take a selfie');
+
+  if (mode === 'selfie') {
+    // Show camera UI then auto-capture after 2.5s
+    showTyping(); await delay(400); hideTyping();
+    addCard(`<div style="background:var(--grey-100);border-radius:var(--shape-lg);overflow:hidden;width:100%;position:relative">
+      <div style="height:280px;display:flex;align-items:center;justify-content:center;position:relative">
+        <div style="width:160px;height:160px;border-radius:50%;border:3px solid var(--white);opacity:0.5"></div>
+        <div style="position:absolute;top:14px;left:14px;font-size:11px;font-weight:700;color:var(--white);opacity:0.7">Front Camera</div>
+        <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:20px">
+          <button onclick="captureAndGenerate('${id}')" style="width:56px;height:56px;border-radius:50%;border:4px solid var(--white);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><div style="width:44px;height:44px;border-radius:50%;background:var(--white);pointer-events:none"></div></button>
+        </div>
+      </div>
+    </div>`, true);
+    addAI('Tap the shutter to capture, or wait...', true);
+    // Auto-capture after 2.5s — only if not already triggered
+    setTimeout(() => { if(!tryOnInProgress) captureAndGenerate(id); }, 2500);
+    return;
+  }
+
+  // Profile photo path — go straight to generation
+  tryOnInProgress = true;
+  showTyping(); await delay(600); hideTyping();
+  addAI('Using your profile photo...', true);
+  await delay(300);
+  await runTryOnGeneration(id);
+}
+
+async function captureAndGenerate(id) {
+  if (tryOnInProgress) return; // Prevent double-fire
+  tryOnInProgress = true;
+  addAI('Photo captured! Hold on...', true);
+  await delay(400);
+  await runTryOnGeneration(id);
+}
+
+async function runTryOnGeneration(id) {
+  // Show generation progress
+  addCard(`<div class="gen-card">
+    <div class="gen-icon">${svg(IC.fashion,32,32)}</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text-high)">Generating Virtual Try-On</div>
+    <div class="gen-progress"><div class="gen-progress-bar"></div></div>
+    <div class="gen-label">Analysing fit, drape & proportions...</div>
+  </div>`, true);
+
+  await delay(3200);
+
+  const p = products.tryonProducts.find(x => x.id === id);
+  const fitMessages = {
+    lehenga: { text: '<b>Great fit!</b> The lehenga sits well at the waist. Consider <b>size M</b> for a slightly relaxed drape around the flare.', type: 'good' },
+    saree: { text: '<b>Excellent drape!</b> The pallu falls naturally. The blouse may be <b>slightly snug at shoulders</b> \u2014 consider size L.', type: 'warn' },
+    dress: { text: '<b>Perfect fit!</b> Size S fits your measurements precisely. The midi length hits right at the calf.', type: 'good' },
+    _selected: { text: '<b>Great fit!</b> This looks amazing on you. The proportions are well-balanced \u2014 consider your usual size.', type: 'good' },
+  };
+  const fit = fitMessages[id] || fitMessages._selected;
+
+  const tryonColors = {
+    lehenga: { bg: '#FCE4EC', accent: '#C62828', label: 'Lehenga Set' },
+    saree: { bg: '#FFF3E0', accent: '#E65100', label: 'Saree' },
+    dress: { bg: '#E8F5E9', accent: '#2E7D32', label: 'Midi Dress' },
+    _selected: { bg: '#E3F2FD', accent: '#1565C0', label: p.name },
+  };
+  const tc = tryonColors[id] || tryonColors._selected;
+
+  addCard(`<div class="tryon-card">
+    <div class="tryon-header">
+      <div class="tryon-header-icon">${svg(IC.success,18,18)}</div>
+      <div class="tryon-header-title">Your Virtual Try-On</div>
+    </div>
+    <div style="width:100%;height:400px;position:relative;overflow:hidden;background:${tc.bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+      <div style="width:140px;height:220px;border-radius:var(--shape-lg);background:var(--white);box-shadow:0 4px 20px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px">
+        <div style="width:80px;height:80px;border-radius:50%;background:${tc.bg};border:3px solid ${tc.accent};display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" width="36" height="36"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="${tc.accent}"/></svg>
+        </div>
+        <div style="width:60px;height:3px;border-radius:2px;background:${tc.accent};opacity:0.3"></div>
+        <div style="font-size:11px;font-weight:700;color:${tc.accent};text-align:center">${user.name}</div>
+      </div>
+      <div style="background:var(--white);padding:8px 16px;border-radius:var(--shape-pill);font-size:12px;font-weight:700;color:${tc.accent};box-shadow:0 2px 8px rgba(0,0,0,0.06)">Wearing: ${p.name}</div>
+      <div style="position:absolute;top:10px;right:10px;background:var(--sparkle-50);color:var(--white);font-size:10px;font-weight:700;padding:4px 10px;border-radius:var(--shape-pill)">AI Generated</div>
+      <div style="position:absolute;bottom:10px;left:10px;right:10px;text-align:center;font-size:11px;font-weight:500;color:rgba(0,0,0,0.38)">Generative AI visualisation \u2022 Actual result may vary</div>
+    </div>
+    <div class="tryon-fit">
+      <div class="tryon-fit-icon">${svg(fit.type === 'good' ? IC.success : IC.star, 16, 16)}</div>
+      <div class="tryon-fit-text">${fit.text}</div>
+    </div>
+    <div class="tryon-product">
+      <div class="tryon-product-info">
+        <div class="tryon-product-name">${p.name}</div>
+        <div class="tryon-product-brand">${p.brand}</div>
+      </div>
+      <div class="tryon-product-price">\u20B9${p.price}</div>
+    </div>
+    <div class="tryon-cta" style="padding:12px 14px">
+      <button class="lookbook-cta-btn lookbook-cta-primary" onclick="addToCart('${p.name}',${p.price})">Add to Bag \u2014 \u20B9${p.price}</button>
+    </div>
+  </div>`, true);
+  addFeedback();
+
+  await delay(300);
+  addChips([
+    { label: 'Try another color', style: 'chip-outline', action: "tryOnRefine('color')" },
+    { label: 'Try different product', style: 'chip-outline', action: "tryOnRefine('different')" },
+    { label: 'Add to Bag', style: 'chip-primary', action: `addToCart('${p.name}',${p.price})` },
+  ]);
+}
+
+async function tryOnRefine(type) {
+  clearChips();
+  addUser(type === 'color' ? 'Try another color' : 'Try different product');
+  showTyping(); await delay(800); hideTyping();
+  if (type === 'color') {
+    addAI('Here\u2019s the same lehenga in <b>Emerald Green</b>. The AI try-on shows excellent drape with this color on your skin tone!');
+    await delay(300);
+    addCard(`<div class="why-card" style="background:var(--sparkle-20)">
+      <div class="why-title" style="color:var(--sparkle-70)">Color Comparison</div>
+      <div class="why-item"><span class="why-bullet" style="color:var(--sparkle-50)">\u2022</span> <b>Original (Red)</b> \u2014 Classic festive, warm tones</div>
+      <div class="why-item"><span class="why-bullet" style="color:var(--sparkle-50)">\u2022</span> <b>Emerald Green</b> \u2014 Complements your warm undertone beautifully</div>
+      <div class="why-item"><span class="why-bullet" style="color:var(--sparkle-50)">\u2022</span> <b>AI Recommendation:</b> Go with Emerald \u2014 it\u2019s unique & suits you better!</div>
+    </div>`, true);
+    await delay(300);
+    addChips([
+      { label: 'Add Green to Bag', style: 'chip-primary', action: "addToCart('Emerald Lehenga Set',4999)" },
+      { label: 'Back', style: 'chip-secondary', action: 'backToUseCases()' },
+    ]);
+  } else {
+    startTryOn(activeCat);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CROSS-LINKING BETWEEN FLOWS
+   ══════════════════════════════════════════════ */
+async function crossLinkTryOn(item) {
+  clearChips();
+  addUser('Try this on');
+  showTyping(); await delay(600); hideTyping();
+  addAI('Tap on the product you\u2019d like to try on:');
+  // Make all product cards tappable for try-on
+  enableTryOnMode();
+}
+
+function enableTryOnMode() {
+  const pool = window._lastResults || (activeCat === 'footwear' ? products.sneakers : products.kurtas);
+  document.querySelectorAll('.product-card').forEach((card, i) => {
+    if (i >= pool.length) return;
+    card.style.outline = '2px solid var(--sparkle-50)';
+    card.style.cursor = 'pointer';
+    card.onclick = function(e) {
+      e.stopPropagation();
+      document.querySelectorAll('.product-card').forEach(c => { c.style.outline = ''; c.onclick = null; });
+      const p = pool[i];
+      selectProductForTryOn(p);
+    };
+  });
+}
+
+async function selectProductForTryOn(p) {
+  tryOnInProgress = false;
+  addUser(p.name);
+  showTyping(); await delay(600); hideTyping();
+  addAI(`The <b>${p.name}</b> by ${p.brand} (\u20B9${p.price}). How would you like to try it on?`);
+  await delay(300);
+  window._tryOnProduct = { name: p.name, brand: p.brand, price: p.price };
+  addChips([
+    { label: 'Use profile photo', style: 'chip-primary', action: "generateTryOnFromProduct('profile')" },
+    { label: 'Take new selfie', style: 'chip-outline', action: "generateTryOnFromProduct('selfie')" },
+  ]);
+}
+
+async function generateTryOnFromProduct(mode) {
+  const p = window._tryOnProduct || { name: 'Selected Item', brand: 'AJIO', price: 599 };
+  products.tryonProducts.push({ id: '_selected', name: p.name, brand: p.brand, price: p.price, color: '#E3F2FD' });
+  await generateTryOn('_selected', mode);
+  products.tryonProducts = products.tryonProducts.filter(t => t.id !== '_selected');
+}
+
+async function crossLinkDiscovery(type) {
+  clearChips();
+  addUser('Find similar kurtas');
+  showTyping(); await delay(1000); hideTyping();
+  addAI('Based on your Diwali look, here are <b>similar kurtas</b> you might love:');
+  await delay(400);
+  addCard(`<div class="product-grid">${products.kurtas.map(p => productCardHTML(p)).join('')}</div>`, true);
+  addFeedback();
+  await delay(300);
+  addChips([
+    { label: 'Filter by price', style: 'chip-outline', action: "voiceRefine('price')" },
+    { label: 'Try this on', style: 'chip-sparkle', action: "crossLinkTryOn('kurta')" },
+    { label: 'Back', style: 'chip-secondary', action: 'backToUseCases()' },
+  ]);
+}
+
+/* ══════════════════════════════════════════════
+   ADD TO CART & PAYMENT
+   ══════════════════════════════════════════════ */
+async function addToCart(name, price) {
+  clearChips();
+  addUser(`Add to Bag \u2014 \u20B9${price}`);
+  showTyping(); await delay(800); hideTyping();
+
+  addCard(`<div class="cart-card">
+    <div class="cart-header"><div class="cart-header-left">${svg(IC.cart,18,18)}<span>Your AJIO Bag</span></div><div class="cart-count">1 item</div></div>
+    <div class="prod-row">
+      <div class="prod-thumb" style="background:var(--primary-20);color:var(--primary-50)">AJ</div>
+      <div class="prod-info"><div class="prod-name">${name}</div><div class="prod-variant">Size: M | Color: As shown</div></div>
+      <div class="prod-price-col"><div class="prod-price">\u20B9${price}</div></div>
+    </div>
+    <div class="cart-total">
+      <div><div class="cart-total-label">Total</div><div class="cart-total-sub">Free delivery on AJIO</div></div>
+      <div class="cart-total-price">\u20B9${price}</div>
+    </div>
+  </div>`, true);
+
+  await delay(300);
+  addChips([
+    { label: 'Place Order', style: 'chip-primary', action: `confirmOrder(${price})` },
+    { label: 'Continue Shopping', style: 'chip-outline', action: 'backToUseCases()' },
+  ]);
+}
+
+async function addFullOutfitToCart() {
+  clearChips();
+  const outfit = products.diwaliOutfit;
+  addUser('Add all to Bag');
+  showTyping(); await delay(1000); hideTyping();
+
+  addCard(`<div class="cart-card">
+    <div class="cart-header"><div class="cart-header-left">${svg(IC.cart,18,18)}<span>Your AJIO Bag</span></div><div class="cart-count">${outfit.items.length} items</div></div>
+    ${outfit.items.map(i => `<div class="prod-row">
+      <div class="prod-thumb" style="background:${i.color};color:#333">${i.abbr}</div>
+      <div class="prod-info"><div class="prod-name">${i.name}</div><div class="prod-variant">${i.brand}</div></div>
+      <div class="prod-price-col"><div class="prod-price">\u20B9${i.price}</div><div class="prod-mrp">\u20B9${i.mrp}</div></div>
+    </div>`).join('')}
+    <div class="cart-total">
+      <div><div class="cart-total-label">Total (${outfit.items.length} items)</div><div class="cart-total-sub" style="color:var(--success)">You save \u20B9${outfit.saving.toLocaleString('en-IN')}</div></div>
+      <div class="cart-total-price">\u20B9${outfit.total.toLocaleString('en-IN')}</div>
+    </div>
+  </div>`, true);
+
+  await delay(300);
+  addChips([
+    { label: 'Place Order', style: 'chip-primary', action: `confirmOrder(${outfit.total})` },
+    { label: 'Continue Shopping', style: 'chip-outline', action: 'backToUseCases()' },
+  ]);
+}
+
+async function confirmOrder(amount) {
+  clearChips();
+  addUser('Place order');
+  showTyping(); await delay(1000); hideTyping();
+  addAI('Choose how you\u2019d like to pay:');
+  await delay(500);
+
+  addCard(`<div class="payment-card">
+    <div class="pay-header">${svg(IC.cart,20,20)}<div class="pay-header-text"><div class="pay-header-title">Choose payment method</div><div class="pay-header-sub">AJIO Order</div></div></div>
+    <div class="pay-amount"><span class="pay-amount-label">Total payable</span><span class="pay-amount-val">\u20B9${amount.toLocaleString('en-IN')}</span></div>
+    <div class="pay-methods">
+      <div class="pay-method selected" onclick="selectPay(this)"><div class="pay-method-icon" style="background:var(--primary-20);color:var(--primary-50);font-size:10px;font-weight:900">UPI</div><div class="pay-method-info"><div class="pay-method-name">JioPay UPI<span class="pay-method-tag" style="background:var(--sparkle-20);color:var(--sparkle-70)">Fastest</span></div><div class="pay-method-detail">priya@jio \u2022 Instant</div></div><div class="pay-radio"></div></div>
+      <div class="pay-method" onclick="selectPay(this)"><div class="pay-method-icon" style="background:var(--grey-20);color:var(--text-high);font-size:10px;font-weight:900">CARD</div><div class="pay-method-info"><div class="pay-method-name">Credit / Debit Card</div><div class="pay-method-detail">HDFC \u2022\u2022\u2022 4829</div></div><div class="pay-radio"></div></div>
+      <div class="pay-method" onclick="selectPay(this)"><div class="pay-method-icon" style="background:var(--secondary-20);color:var(--secondary-60);font-size:10px;font-weight:900">COD</div><div class="pay-method-info"><div class="pay-method-name">Cash on Delivery</div><div class="pay-method-detail">Pay when order arrives</div></div><div class="pay-radio"></div></div>
+    </div>
+    <div class="pay-footer"><button class="pay-btn" onclick="processPayment(${amount})">Pay \u20B9${amount.toLocaleString('en-IN')}</button><div class="pay-secured">${svg(IC.success,12,12)} Secured by Jio Payments Bank</div></div>
+  </div>`, true);
+}
+
+function selectPay(el) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function processPayment(amount) {
+  // Remove payment card
+  showTyping(); await delay(2000); hideTyping();
+  addCard(`<div class="success-card">
+    ${svg(IC.success,40,40)}
+    <div class="success-card-title">Order Placed!</div>
+    <div class="success-card-sub">Your AJIO order of \u20B9${amount.toLocaleString('en-IN')} has been confirmed. Estimated delivery: 3\u20135 business days.</div>
+  </div>`, true);
+  await delay(500);
+  addAI('Happy shopping, ' + user.name + '! Anything else I can help you find?', true);
+  await delay(300);
+  addChips([
+    { label: 'Shop more', style: 'chip-primary', action: 'backToUseCases()' },
+    { label: 'Track order', style: 'chip-outline', action: 'trackOrder()' },
+  ]);
+}
+
+async function trackOrder() {
+  clearChips();
+  addUser('Track my order');
+  showTyping(); await delay(800); hideTyping();
+  addAI('Your order is being processed! Here\u2019s the status:');
+  await delay(300);
+  addCard(`<div style="background:var(--white);border:1px solid var(--stroke-subtle);border-radius:var(--shape-lg);padding:14px;width:100%">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--success)"></div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-high)">Order Confirmed</div>
+      <div style="font-size:11px;color:var(--text-low);margin-left:auto">Just now</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;opacity:0.5">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--grey-40)"></div>
+      <div style="font-size:13px;font-weight:500;color:var(--text-low)">Shipped</div>
+      <div style="font-size:11px;color:var(--text-disabled);margin-left:auto">Expected tomorrow</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;opacity:0.38">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--grey-40)"></div>
+      <div style="font-size:13px;font-weight:500;color:var(--text-disabled)">Delivered</div>
+      <div style="font-size:11px;color:var(--text-disabled);margin-left:auto">3\u20135 days</div>
+    </div>
+  </div>`, true);
+  await delay(300);
+  addChips([{ label: 'Shop more', style: 'chip-primary', action: 'backToUseCases()' }]);
+}
+
+/* ══════════════════════════════════════════════
+   TEXT INPUT HANDLER
+   ══════════════════════════════════════════════ */
+function handleSend() {
+  const text = chatInput.value.trim(); if (!text) return;
+  chatInput.value = ''; toggleSendBtn();
+  const lower = text.toLowerCase();
+
+  if (lower.includes('kurta') || lower.includes('shirt') || lower.includes('dress')) {
+    addUser(text); triggerVoiceFlow('kurta');
+  } else if (lower.includes('sneaker') || lower.includes('shoe') || lower.includes('nike')) {
+    addUser(text); triggerVoiceFlow('sneakers');
+  } else if (lower.includes('diwali') || lower.includes('outfit') || lower.includes('suggest')) {
+    addUser(text); styleAdvisorFlow('diwali');
+  } else if (lower.includes('try on') || lower.includes('try-on') || lower.includes('kaisa lagega')) {
+    addUser(text); startTryOn('clothing');
+  } else {
+    addUser(text);
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      addAI('I can help with that! Try browsing our categories or use voice search to find exactly what you need.');
+      showWelcomeCards();
+    }, 1000);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   START CONVERSATION
+   ══════════════════════════════════════════════ */
+async function startConversation() {
+  await delay(400);
+  addAI(`Hi ${user.name}! I\u2019m your <b>AI Fashion Assistant</b>. What are you looking for today?`);
+  await delay(300);
+  showWelcomeCards();
+}
+
+// Initialize
+startConversation();
+</script>
+</body>
+</html>
